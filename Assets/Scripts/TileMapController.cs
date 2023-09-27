@@ -1,6 +1,3 @@
-using System;
-using System.Text;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
@@ -9,6 +6,7 @@ public class TileMapController : MonoBehaviour
 {
     [SerializeField] Tilemap tilemap;
     [SerializeField] Tile[] tiles;
+    [SerializeField] LineRenderer winLine;
     Tile darkTile;
     Tile vacant;
     Tile blue;
@@ -19,10 +17,12 @@ public class TileMapController : MonoBehaviour
     private const int StartSize = 15;
     private const int ExpandSize = 3;
     private const int WinCondition = 5;
+    private Vector3 centerOffsetVector;
 
 
     private void OnEnable()
     {
+        centerOffsetVector = new Vector3 (CellSize/2, CellSize/2, 0);
         Inputs.Controls.Main.Click.started += ClickedTile;  
         Inputs.Controls.Main.RClick.started += RClickedTile;  
         Inputs.Controls.Main.Space.started += SpaceInput;  
@@ -40,6 +40,7 @@ public class TileMapController : MonoBehaviour
         CreateStartGrid();
         CenterGrid();
         StateController.Instance.State = State.Playing;
+        winLine.gameObject.SetActive(false);
     }
     private void ClickedTile(InputAction.CallbackContext context)
     {
@@ -79,6 +80,19 @@ public class TileMapController : MonoBehaviour
         if (CheckGameComplete())
         {
             Debug.Log("Someone Won");
+
+            winLine.gameObject.SetActive(true);
+
+            // Show Line
+            winLine.startColor = Color.red;
+            winLine.endColor = Color.red;
+            winLine.startWidth = 0.05f;
+            winLine.endWidth = 0.05f;
+
+            Vector3[] linePositions = TileMapIndexAsPositions();
+
+            winLine.SetPositions(linePositions);
+
             FindObjectOfType<InfoController>().ShowPanel();
 
             FindObjectOfType<InfoController>().SetWinner(countedTile.name);
@@ -86,8 +100,15 @@ public class TileMapController : MonoBehaviour
         }
     }
 
+    private Vector3[] TileMapIndexAsPositions()
+    {
+        Debug.Log("Index from/to: "+line);
+        return new Vector3[] { tilemap.CellToWorld((Vector3Int)line[0]) + centerOffsetVector, tilemap.CellToWorld((Vector3Int)line[1]) + centerOffsetVector };
+    }
+
     int counter = 0;
     Tile countedTile = null;
+    Vector2Int[] line = new Vector2Int[2];
 
     private bool CheckGameComplete()
     {
@@ -122,13 +143,22 @@ public class TileMapController : MonoBehaviour
         {
             if (currentTile != countedTile)
             {
+                line[0] = new Vector2Int(i, j);
                 counter = 0;
                 countedTile = currentTile;
             }
             counter++;
-            if (counter == WinCondition) return true;
+            if (counter == WinCondition)
+            {
+                line[1] = new Vector2Int(i, j);
+                return true;
+            }
         }
-        else counter = 0;
+        else
+        {
+            counter = 0;
+            countedTile = null;
+        }
         return false;
     }
 

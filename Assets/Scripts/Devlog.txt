@@ -11,6 +11,7 @@ DEVLOG FOR - FIVE IN A ROW
 		* Win check copleted for diagonal and vertical, horizontal
 		* Level expands so always 3 spaces are free at the border
 		* Win Complete UI pops up telling who won
+		* Added win Line that shows how someone won
 
 		TODO
 		* Have a red line for the winner
