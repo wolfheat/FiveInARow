@@ -1,0 +1,18 @@
+DEVLOG FOR - FIVE IN A ROW
+27 Sep 2023
+
+
+* IDEAS
+- Make A simple turn based game using multiplayer mobile 5 in a row.
+
+
+27/9	* Starting with simple prototype
+		* Have Game working
+		* Win check copleted for diagonal and vertical, horizontal
+		* Level expands so always 3 spaces are free at the border
+		* Win Complete UI pops up telling who won
+
+
+		BUGS
+		S
+------ ------- ------
