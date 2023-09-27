@@ -12,7 +12,14 @@ DEVLOG FOR - FIVE IN A ROW
 		* Level expands so always 3 spaces are free at the border
 		* Win Complete UI pops up telling who won
 
+		TODO
+		* Have a red line for the winner
+		* Inplement server code for multiplayer
+		* Have some kind of lobby? Matchmaking
+		* Sounds? Music?
+		* Add zoom
+		* Add touch input
 
-		BUGS
-		S
+
+		
 ------ ------- ------

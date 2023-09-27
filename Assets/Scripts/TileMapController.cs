@@ -16,7 +16,7 @@ public class TileMapController : MonoBehaviour
     Tile O;
 
     private const float CellSize = 0.32f;
-    private const int StartSize = 9;
+    private const int StartSize = 15;
     private const int ExpandSize = 3;
     private const int WinCondition = 5;
 
