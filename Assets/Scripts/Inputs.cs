@@ -4,7 +4,7 @@ public class Inputs : MonoBehaviour
 {
     public static Controls Controls { get; set;} 
 
-    private void Awake()
+    private void OnEnable()
     {
         Controls = new Controls();
         Controls.Enable();

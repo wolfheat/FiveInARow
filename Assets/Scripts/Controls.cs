@@ -29,12 +29,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             ""actions"": [
                 {
                     ""name"": ""Click"",
-                    ""type"": ""Button"",
+                    ""type"": ""Value"",
                     ""id"": ""323b968a-a29d-455b-a325-f890807a0926"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Space"",
@@ -53,6 +53,42 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ScrollDown"",
+                    ""type"": ""Value"",
+                    ""id"": ""c4e12a96-c4dc-4b3f-892e-63bfa4684040"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ScrollUp"",
+                    ""type"": ""Value"",
+                    ""id"": ""3b9b8caa-91d2-4656-8642-37cb6e4e5697"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Scroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""eaab5405-8334-48f3-877e-28d71bb85710"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Shift"",
+                    ""type"": ""Button"",
+                    ""id"": ""48ee66a7-e8fd-4596-8391-81ba10d762c1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -60,6 +96,17 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""267feb2f-6592-4f79-9d33-95be1041bbe2"",
                     ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""657e7dd2-1602-4bdf-a322-bb7d4490b8ac"",
+                    ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -88,6 +135,118 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""RClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5f21ce59-9109-4b98-b868-2a407d4876ab"",
+                    ""path"": ""<Mouse>/scroll/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ScrollDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8bb1d4d7-026e-4d00-accc-a7beba4d29e6"",
+                    ""path"": ""<Mouse>/scroll/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ScrollUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e2c2aa4d-5832-4166-8662-5021462a6868"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""864677b7-dc83-4fc5-8d40-550f410feb7f"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shift"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Touch"",
+            ""id"": ""5cea29b6-f956-4e20-9244-1c9b5beadd22"",
+            ""actions"": [
+                {
+                    ""name"": ""TouchPress"",
+                    ""type"": ""Button"",
+                    ""id"": ""7f51f944-4b25-40c1-bc75-b5ebd7c225e1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TouchInput"",
+                    ""type"": ""Button"",
+                    ""id"": ""2440290e-c38f-4426-ab77-a913bda34203"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TouchPosition"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""8e3bc092-e621-4ebe-aa84-4fbf87667b6d"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""915b3aab-554a-4fee-b7ff-34a749b743c5"",
+                    ""path"": ""<Touchscreen>/primaryTouch/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TouchPress"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6476d47f-d70c-45b1-b63f-cea37a576545"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TouchInput"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f483f3aa-71df-494a-b773-eae631b8b68b"",
+                    ""path"": ""<Touchscreen>/primaryTouch/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TouchPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -99,6 +258,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Main_Click = m_Main.FindAction("Click", throwIfNotFound: true);
         m_Main_Space = m_Main.FindAction("Space", throwIfNotFound: true);
         m_Main_RClick = m_Main.FindAction("RClick", throwIfNotFound: true);
+        m_Main_ScrollDown = m_Main.FindAction("ScrollDown", throwIfNotFound: true);
+        m_Main_ScrollUp = m_Main.FindAction("ScrollUp", throwIfNotFound: true);
+        m_Main_Scroll = m_Main.FindAction("Scroll", throwIfNotFound: true);
+        m_Main_Shift = m_Main.FindAction("Shift", throwIfNotFound: true);
+        // Touch
+        m_Touch = asset.FindActionMap("Touch", throwIfNotFound: true);
+        m_Touch_TouchPress = m_Touch.FindAction("TouchPress", throwIfNotFound: true);
+        m_Touch_TouchInput = m_Touch.FindAction("TouchInput", throwIfNotFound: true);
+        m_Touch_TouchPosition = m_Touch.FindAction("TouchPosition", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -163,6 +331,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Main_Click;
     private readonly InputAction m_Main_Space;
     private readonly InputAction m_Main_RClick;
+    private readonly InputAction m_Main_ScrollDown;
+    private readonly InputAction m_Main_ScrollUp;
+    private readonly InputAction m_Main_Scroll;
+    private readonly InputAction m_Main_Shift;
     public struct MainActions
     {
         private @Controls m_Wrapper;
@@ -170,6 +342,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @Click => m_Wrapper.m_Main_Click;
         public InputAction @Space => m_Wrapper.m_Main_Space;
         public InputAction @RClick => m_Wrapper.m_Main_RClick;
+        public InputAction @ScrollDown => m_Wrapper.m_Main_ScrollDown;
+        public InputAction @ScrollUp => m_Wrapper.m_Main_ScrollUp;
+        public InputAction @Scroll => m_Wrapper.m_Main_Scroll;
+        public InputAction @Shift => m_Wrapper.m_Main_Shift;
         public InputActionMap Get() { return m_Wrapper.m_Main; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -188,6 +364,18 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @RClick.started += instance.OnRClick;
             @RClick.performed += instance.OnRClick;
             @RClick.canceled += instance.OnRClick;
+            @ScrollDown.started += instance.OnScrollDown;
+            @ScrollDown.performed += instance.OnScrollDown;
+            @ScrollDown.canceled += instance.OnScrollDown;
+            @ScrollUp.started += instance.OnScrollUp;
+            @ScrollUp.performed += instance.OnScrollUp;
+            @ScrollUp.canceled += instance.OnScrollUp;
+            @Scroll.started += instance.OnScroll;
+            @Scroll.performed += instance.OnScroll;
+            @Scroll.canceled += instance.OnScroll;
+            @Shift.started += instance.OnShift;
+            @Shift.performed += instance.OnShift;
+            @Shift.canceled += instance.OnShift;
         }
 
         private void UnregisterCallbacks(IMainActions instance)
@@ -201,6 +389,18 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @RClick.started -= instance.OnRClick;
             @RClick.performed -= instance.OnRClick;
             @RClick.canceled -= instance.OnRClick;
+            @ScrollDown.started -= instance.OnScrollDown;
+            @ScrollDown.performed -= instance.OnScrollDown;
+            @ScrollDown.canceled -= instance.OnScrollDown;
+            @ScrollUp.started -= instance.OnScrollUp;
+            @ScrollUp.performed -= instance.OnScrollUp;
+            @ScrollUp.canceled -= instance.OnScrollUp;
+            @Scroll.started -= instance.OnScroll;
+            @Scroll.performed -= instance.OnScroll;
+            @Scroll.canceled -= instance.OnScroll;
+            @Shift.started -= instance.OnShift;
+            @Shift.performed -= instance.OnShift;
+            @Shift.canceled -= instance.OnShift;
         }
 
         public void RemoveCallbacks(IMainActions instance)
@@ -218,10 +418,82 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         }
     }
     public MainActions @Main => new MainActions(this);
+
+    // Touch
+    private readonly InputActionMap m_Touch;
+    private List<ITouchActions> m_TouchActionsCallbackInterfaces = new List<ITouchActions>();
+    private readonly InputAction m_Touch_TouchPress;
+    private readonly InputAction m_Touch_TouchInput;
+    private readonly InputAction m_Touch_TouchPosition;
+    public struct TouchActions
+    {
+        private @Controls m_Wrapper;
+        public TouchActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @TouchPress => m_Wrapper.m_Touch_TouchPress;
+        public InputAction @TouchInput => m_Wrapper.m_Touch_TouchInput;
+        public InputAction @TouchPosition => m_Wrapper.m_Touch_TouchPosition;
+        public InputActionMap Get() { return m_Wrapper.m_Touch; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(TouchActions set) { return set.Get(); }
+        public void AddCallbacks(ITouchActions instance)
+        {
+            if (instance == null || m_Wrapper.m_TouchActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_TouchActionsCallbackInterfaces.Add(instance);
+            @TouchPress.started += instance.OnTouchPress;
+            @TouchPress.performed += instance.OnTouchPress;
+            @TouchPress.canceled += instance.OnTouchPress;
+            @TouchInput.started += instance.OnTouchInput;
+            @TouchInput.performed += instance.OnTouchInput;
+            @TouchInput.canceled += instance.OnTouchInput;
+            @TouchPosition.started += instance.OnTouchPosition;
+            @TouchPosition.performed += instance.OnTouchPosition;
+            @TouchPosition.canceled += instance.OnTouchPosition;
+        }
+
+        private void UnregisterCallbacks(ITouchActions instance)
+        {
+            @TouchPress.started -= instance.OnTouchPress;
+            @TouchPress.performed -= instance.OnTouchPress;
+            @TouchPress.canceled -= instance.OnTouchPress;
+            @TouchInput.started -= instance.OnTouchInput;
+            @TouchInput.performed -= instance.OnTouchInput;
+            @TouchInput.canceled -= instance.OnTouchInput;
+            @TouchPosition.started -= instance.OnTouchPosition;
+            @TouchPosition.performed -= instance.OnTouchPosition;
+            @TouchPosition.canceled -= instance.OnTouchPosition;
+        }
+
+        public void RemoveCallbacks(ITouchActions instance)
+        {
+            if (m_Wrapper.m_TouchActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ITouchActions instance)
+        {
+            foreach (var item in m_Wrapper.m_TouchActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_TouchActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public TouchActions @Touch => new TouchActions(this);
     public interface IMainActions
     {
         void OnClick(InputAction.CallbackContext context);
         void OnSpace(InputAction.CallbackContext context);
         void OnRClick(InputAction.CallbackContext context);
+        void OnScrollDown(InputAction.CallbackContext context);
+        void OnScrollUp(InputAction.CallbackContext context);
+        void OnScroll(InputAction.CallbackContext context);
+        void OnShift(InputAction.CallbackContext context);
+    }
+    public interface ITouchActions
+    {
+        void OnTouchPress(InputAction.CallbackContext context);
+        void OnTouchInput(InputAction.CallbackContext context);
+        void OnTouchPosition(InputAction.CallbackContext context);
     }
 }

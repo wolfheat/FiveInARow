@@ -1,232 +1,144 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
+using TileMapExtensions;
+using System;
 
+public enum Tiletype{X,O}
 public class TileMapController : MonoBehaviour
 {
+    [SerializeField] CameraController cameraController;
     [SerializeField] Tilemap tilemap;
     [SerializeField] Tile[] tiles;
-    [SerializeField] LineRenderer winLine;
-    Tile darkTile;
-    Tile vacant;
-    Tile blue;
-    Tile X;
-    Tile O;
+    [SerializeField] LineRendererController winLine;
+    [SerializeField] GameController gameController;
+    Tile darkTile,vacant,X,O,blue;
 
-    private const float CellSize = 0.32f;
+    public Tilemap TileMap { get {return tilemap; }}
+
+    WinEvaluator winEvaluator = new WinEvaluator();
+
+    //Constants
+    public float CellSize = 0.32f;
     private const int StartSize = 15;
     private const int ExpandSize = 3;
-    private const int WinCondition = 5;
     private Vector3 centerOffsetVector;
 
-
+    public static Action PositionChange;
+    
     private void OnEnable()
     {
         centerOffsetVector = new Vector3 (CellSize/2, CellSize/2, 0);
-        Inputs.Controls.Main.Click.started += ClickedTile;  
-        Inputs.Controls.Main.RClick.started += RClickedTile;  
-        Inputs.Controls.Main.Space.started += SpaceInput;  
     }
 
-    private void SpaceInput(InputAction.CallbackContext context)
+    void Start()
     {
+        //Define tile types
+        vacant = tiles[0];        X = tiles[1];        O = tiles[2];        darkTile = tiles[3];        blue = tiles[4];
         ResetGame();
-        FindObjectOfType<InfoController>().ShowPanel(false);
     }
-    private void ResetGame()
+
+    public void ResetGame()
     {
-        Debug.Log("Reset");
         ResetTileMap();
         CreateStartGrid();
-        CenterGrid();
-        StateController.Instance.State = State.Playing;
-        winLine.gameObject.SetActive(false);
-    }
-    private void ClickedTile(InputAction.CallbackContext context)
-    {
-        if(StateController.Instance.State == State.Playing)
-            RequestChangeTile(X);
-    }
-    private void RClickedTile(InputAction.CallbackContext context)
-    {
-        if (StateController.Instance.State  == State.Playing)
-            RequestChangeTile(O);
+        PositionChange?.Invoke();
     }
 
-    private void RequestChangeTile(Tile ChangeToType)
+    
+    // Actions
+    public void RequestChangeTile(Tiletype t)
     {
+        Tile ChangeToType = t == Tiletype.X ? X : O;
         // Get Mouse Position
-        Vector2 mousePosition = Mouse.current.position.value;
+        //Vector2 mousePosition = Mouse.current.position.value;
+        Vector2 mousePosition = Inputs.Controls.Touch.TouchPosition.ReadValue<Vector2>();
+
+        Debug.Log("MousePosition: "+ mousePosition);
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePosition);
+        Debug.Log("WorldPosition: "+ worldPos);
 
         // Get Clicked Index
         Vector3Int tilePos = tilemap.WorldToCell(worldPos);
-        Vector3Int clickedIndex = new Vector3Int(tilePos.x, tilePos.y,1);   
+        Vector3Int clickedIndex = new Vector3Int(tilePos.x, tilePos.y,1);
 
+        if (IndexIsOutOfBounds(clickedIndex))
+        {
+            Debug.Log("Index OOB: "+ clickedIndex);
+            return;
+        }
 
-        if (IndexIsOutOfBounds(clickedIndex)) return;
-
-        // Check if tile is allready used
+        // Check if tile is occupied
         TileBase clickedTile = tilemap.GetTile(clickedIndex);
-        if (TileIsUsed(clickedTile))return;
+        if (TileIsOccupied(clickedTile))
+        {
+            Debug.Log("Tile Occupied");
 
-        // Change the tile
+            return;
+        }
+
+        // Change the tile if free
         tilemap.SetTile(clickedIndex,ChangeToType);
 
         // Expand game area
-        ExpandIfOutside(clickedIndex);
+        ExpandTileMapIfNewMarkerIsToCloseToBorder(clickedIndex);
 
         // Check for game complete
-        if (CheckGameComplete())
-        {
-            Debug.Log("Someone Won");
-
-            winLine.gameObject.SetActive(true);
-
-            // Show Line
-            winLine.startColor = Color.red;
-            winLine.endColor = Color.red;
-            winLine.startWidth = 0.05f;
-            winLine.endWidth = 0.05f;
-
-            Vector3[] linePositions = TileMapIndexAsPositions();
-
-            winLine.SetPositions(linePositions);
-
-            FindObjectOfType<InfoController>().ShowPanel();
-
-            FindObjectOfType<InfoController>().SetWinner(countedTile.name);
-            StateController.Instance.State = State.Paused;
-        }
+        if (winEvaluator.CheckGameComplete(tilemap,vacant))
+            gameController.HandleWin(winEvaluator.CountedTile.name);
     }
 
-    private Vector3[] TileMapIndexAsPositions()
+    public Vector3[] TileMapLineIndexesAsWorldPositions()
     {
-        Debug.Log("Index from/to: "+line);
-        return new Vector3[] { tilemap.CellToWorld((Vector3Int)line[0]) + centerOffsetVector, tilemap.CellToWorld((Vector3Int)line[1]) + centerOffsetVector };
+        return new Vector3[] { tilemap.CellToWorld((Vector3Int)winEvaluator.Line[0]) + centerOffsetVector, tilemap.CellToWorld((Vector3Int)winEvaluator.Line[1]) + centerOffsetVector };
     }
-
-    int counter = 0;
-    Tile countedTile = null;
-    Vector2Int[] line = new Vector2Int[2];
-
-    private bool CheckGameComplete()
+        
+    private void ExpandTileMapIfNewMarkerIsToCloseToBorder(Vector3Int clickedIndex)
     {
-        //Horizontal
-        for (int j = 0; j < tilemap.size.y; j++)
-            for (int i = 0; i < tilemap.size.x; i++)
-                if (CountTiles(i, j)) return true;
-
-        for (int k = 0; k < tilemap.size.x; k++)
-        {
-            //Vertical
-            for (int j = 0; j < tilemap.size.y; j++)
-                if (CountTiles(k, j)) return true;
-            
-            //Diagonals 
-            for (int i = k, j = 0; i < tilemap.size.x && j < tilemap.size.y; i++, j++)
-                if (CountTiles(i, j)) return true;
-            for (int i = k, j = tilemap.size.y-1; i < tilemap.size.x && j >= 0; i++, j--)
-                if (CountTiles(i, j)) return true;
-            for (int i = k, j = 0; i >= 0 && j < tilemap.size.y; i--, j++)
-                if (CountTiles(i, j)) return true;
-            for (int i = k, j = tilemap.size.y-1; i >= 0 && j >=0; i--, j--)
-                if (CountTiles(i, j)) return true;
-        }
-        return false;
-    }
-
-    private bool CountTiles(int i,int j)
-    {
-        Tile currentTile = tilemap.GetTile<Tile>(new Vector3Int(i, j, 1));
-        if (currentTile != vacant)
-        {
-            if (currentTile != countedTile)
-            {
-                line[0] = new Vector2Int(i, j);
-                counter = 0;
-                countedTile = currentTile;
-            }
-            counter++;
-            if (counter == WinCondition)
-            {
-                line[1] = new Vector2Int(i, j);
-                return true;
-            }
-        }
-        else
-        {
-            counter = 0;
-            countedTile = null;
-        }
-        return false;
-    }
-
-    private void ExpandIfOutside(Vector3Int clickedIndex)
-    {
-
         if(clickedIndex.x < ExpandSize)
         {
-            int addColumns = ExpandSize - clickedIndex.x;
+            int columnsToAdd = ExpandSize - clickedIndex.x;
             
             // Move Right
-            ShiftBlock(new Vector2Int(addColumns,0));
-            //ShiftColumns(addColumns);
+            tilemap = tilemap.ShiftTileMap(new Vector2Int(columnsToAdd, 0));
 
             // AddColumn
-            AddTileBlock(new Vector2Int(0, 0), new Vector2Int(addColumns, tilemap.size.y));
+            tilemap = tilemap.AddTileMapBlock(new Vector2Int(0, 0), new Vector2Int(columnsToAdd, tilemap.size.y), vacant);
+
+            // Move Camera accordingly
+            cameraController.MoveCamera(new Vector2(CellSize*columnsToAdd,0));
         }
         else if(clickedIndex.x >= tilemap.size.x - ExpandSize - 1)
         {
-            int addColumns = clickedIndex.x + ExpandSize - tilemap.size.x + 1;
+            int columnsToAdd = clickedIndex.x + ExpandSize - tilemap.size.x + 1;
             
             // AddColumn
-            AddTileBlock(new Vector2Int(tilemap.size.x, 0), new Vector2Int(addColumns, tilemap.size.y));
+            tilemap = tilemap.AddTileMapBlock(new Vector2Int(tilemap.size.x, 0), new Vector2Int(columnsToAdd, tilemap.size.y), vacant);
         }
 
         if(clickedIndex.y < ExpandSize)
         {
-            int addRows = ExpandSize - clickedIndex.y;
+            int rowsToAdd = ExpandSize - clickedIndex.y;
 
             // Move Right
-            ShiftBlock(new Vector2Int(0, addRows));
-            //ShiftRows(addRows);
+            tilemap = tilemap.ShiftTileMap(new Vector2Int(0, rowsToAdd));
 
             // AddRow
-            AddTileBlock(new Vector2Int(0,0), new Vector2Int(tilemap.size.x,addRows));
+            tilemap = tilemap.AddTileMapBlock(new Vector2Int(0, 0),new Vector2Int(tilemap.size.x, rowsToAdd),vacant);
+
+            // Move Camera accordingly
+            cameraController.MoveCamera(new Vector2(0,CellSize * rowsToAdd));
         }
         else if(clickedIndex.y >= tilemap.size.y - ExpandSize - 1)
         {
-            int addRows = clickedIndex.y + ExpandSize - tilemap.size.y + 1;
+            int rowsToAdd = clickedIndex.y + ExpandSize - tilemap.size.y + 1;
 
             // AddRow
-            AddTileBlock(new Vector2Int(0,tilemap.size.y), new Vector2Int(tilemap.size.x, addRows));
+            tilemap = tilemap.AddTileMapBlock(new Vector2Int(0, tilemap.size.y), new Vector2Int(tilemap.size.x, rowsToAdd), vacant);
         }
-        CenterGrid();
     }
 
-    private void ShiftBlock(Vector2Int amount)
-    {
-        for (int i = tilemap.size.x-1; i >= 0; i--)
-        {
-            for (int j = tilemap.size.y - 1; j >= 0; j--) 
-            {
-                tilemap.SetTile(new Vector3Int(i + amount.x, j + amount.y, 1), tilemap.GetTile(new Vector3Int(i, j, 1)));
-            }
-        }
-    }
-    private void AddTileBlock(Vector2Int startPos, Vector2Int amount)
-    {
-        for (int i = 0; i < amount.x; i++)
-        {
-            for (int j = 0; j < amount.y; j++)
-            {
-                tilemap.SetTile(new Vector3Int(startPos.x+i, startPos.y+j, 1), vacant);
-            }
-        }
-    }
-    
-    private bool TileIsUsed(TileBase tile)
+    private bool TileIsOccupied(TileBase tile)
     {
         return tile != vacant;
     }
@@ -234,47 +146,15 @@ public class TileMapController : MonoBehaviour
     private bool IndexIsOutOfBounds(Vector3Int clickedIndex)
     {
         if(clickedIndex.x < 0 || clickedIndex.x >= tilemap.size.x)
-        {
-
-            Debug.Log("Clicked Outside X wise: size: "+ tilemap.size.x);
             return true;
-        }
         else if(clickedIndex.y <0 || clickedIndex.y >= tilemap.size.y)
-        {
-            Debug.Log("Clicked Outside Y wise: size: "+ tilemap.size.x);
             return true;
-        }
         return false;
-    }
-
-    void Start()
-    {
-        vacant = tiles[0];
-        X = tiles[1];
-        O = tiles[2];
-        darkTile = tiles[3];
-        blue = tiles[4];
-
-        ResetGame();
-
-        tilemap.SetTile(new Vector3Int(5, 1, 1), darkTile);    
-        tilemap.SetTile(new Vector3Int(0, 0, 1), darkTile);    
     }
 
     private void ResetTileMap()
     {
         tilemap.ClearAllTiles();
-    }
-
-    private void CenterGrid()
-    {
-        float width = tilemap.size.x * CellSize;
-        float height = tilemap.size.y * CellSize;
-        //Set Camera
-        Vector3 camPos = new Vector3(width / 2, height / 2, Camera.main.transform.position.z);
-        Camera.main.transform.position = camPos;
-        //Debug.Log("Setting Camera to position: "+camPos);
-
     }
 
     private void CreateStartGrid()
@@ -287,4 +167,12 @@ public class TileMapController : MonoBehaviour
             }
         }
     }
+
+    public Vector3 GetCenterPosition()
+    {
+        float width = tilemap.size.x * CellSize;
+        float height = tilemap.size.y * CellSize;
+        return new Vector3(width / 2, height / 2, Camera.main.transform.position.z);
+    }
 }
+

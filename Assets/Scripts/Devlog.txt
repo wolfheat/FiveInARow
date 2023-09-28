@@ -12,13 +12,19 @@ DEVLOG FOR - FIVE IN A ROW
 		* Level expands so always 3 spaces are free at the border
 		* Win Complete UI pops up telling who won
 		* Added win Line that shows how someone won
+28/9	* Added basic zoom with 3 levels
+		* Made Separate WinLine controller 
+		* Added Extension methods for expanding tilemap
+		* Touch Input added
+		* Game is now draggable, had some issues with touch movement scaling 
+		* Added clamp for camera so it stays inside game area
 
 		TODO
-		* Have a red line for the winner
 		* Inplement server code for multiplayer
 		* Have some kind of lobby? Matchmaking
+		* Have win line expand further than 5 in a row if there is more
+
 		* Sounds? Music?
-		* Add zoom
 		* Add touch input
 
 
