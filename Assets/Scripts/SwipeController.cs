@@ -41,6 +41,8 @@ public class SwipeController : MonoBehaviour
 
     private void EndTouch(InputAction.CallbackContext context)
     {
+        if (StateController.Instance.State == State.Lobby) return;
+
         endTouch = Inputs.Controls.Touch.TouchPosition.ReadValue<Vector2>();
         //Debug.Log("End Touch at: " + endTouch);
         if(moveCoroutine!=null)StopCoroutine(moveCoroutine);
@@ -49,6 +51,8 @@ public class SwipeController : MonoBehaviour
 
     private void StartTouch(InputAction.CallbackContext context)
     {
+        if (StateController.Instance.State == State.Lobby) return;
+
         startTouch = Inputs.Controls.Touch.TouchPosition.ReadValue<Vector2>();
         if (startTouch == Vector2.zero) return;
 

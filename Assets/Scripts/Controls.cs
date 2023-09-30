@@ -89,6 +89,24 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""L"",
+                    ""type"": ""Button"",
+                    ""id"": ""fd98ab47-bfa7-41da-a41c-77adf5592381"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""M"",
+                    ""type"": ""Button"",
+                    ""id"": ""b9e3c4c5-ed1e-445d-a293-cc11563e0947"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -179,6 +197,28 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Shift"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9982fd30-1f3d-43b1-9582-51ce5154ec3b"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""L"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""462cdf92-d30a-41c0-8581-87e5afc52821"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""M"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -262,6 +302,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Main_ScrollUp = m_Main.FindAction("ScrollUp", throwIfNotFound: true);
         m_Main_Scroll = m_Main.FindAction("Scroll", throwIfNotFound: true);
         m_Main_Shift = m_Main.FindAction("Shift", throwIfNotFound: true);
+        m_Main_L = m_Main.FindAction("L", throwIfNotFound: true);
+        m_Main_M = m_Main.FindAction("M", throwIfNotFound: true);
         // Touch
         m_Touch = asset.FindActionMap("Touch", throwIfNotFound: true);
         m_Touch_TouchPress = m_Touch.FindAction("TouchPress", throwIfNotFound: true);
@@ -335,6 +377,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Main_ScrollUp;
     private readonly InputAction m_Main_Scroll;
     private readonly InputAction m_Main_Shift;
+    private readonly InputAction m_Main_L;
+    private readonly InputAction m_Main_M;
     public struct MainActions
     {
         private @Controls m_Wrapper;
@@ -346,6 +390,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @ScrollUp => m_Wrapper.m_Main_ScrollUp;
         public InputAction @Scroll => m_Wrapper.m_Main_Scroll;
         public InputAction @Shift => m_Wrapper.m_Main_Shift;
+        public InputAction @L => m_Wrapper.m_Main_L;
+        public InputAction @M => m_Wrapper.m_Main_M;
         public InputActionMap Get() { return m_Wrapper.m_Main; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -376,6 +422,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Shift.started += instance.OnShift;
             @Shift.performed += instance.OnShift;
             @Shift.canceled += instance.OnShift;
+            @L.started += instance.OnL;
+            @L.performed += instance.OnL;
+            @L.canceled += instance.OnL;
+            @M.started += instance.OnM;
+            @M.performed += instance.OnM;
+            @M.canceled += instance.OnM;
         }
 
         private void UnregisterCallbacks(IMainActions instance)
@@ -401,6 +453,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Shift.started -= instance.OnShift;
             @Shift.performed -= instance.OnShift;
             @Shift.canceled -= instance.OnShift;
+            @L.started -= instance.OnL;
+            @L.performed -= instance.OnL;
+            @L.canceled -= instance.OnL;
+            @M.started -= instance.OnM;
+            @M.performed -= instance.OnM;
+            @M.canceled -= instance.OnM;
         }
 
         public void RemoveCallbacks(IMainActions instance)
@@ -489,6 +547,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnScrollUp(InputAction.CallbackContext context);
         void OnScroll(InputAction.CallbackContext context);
         void OnShift(InputAction.CallbackContext context);
+        void OnL(InputAction.CallbackContext context);
+        void OnM(InputAction.CallbackContext context);
     }
     public interface ITouchActions
     {

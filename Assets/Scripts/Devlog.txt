@@ -18,6 +18,9 @@ DEVLOG FOR - FIVE IN A ROW
 		* Touch Input added
 		* Game is now draggable, had some issues with touch movement scaling 
 		* Added clamp for camera so it stays inside game area
+29/9	* Added Unity Lobby
+		* Added Lobby/Game Lobby UI
+
 
 		TODO
 		* Inplement server code for multiplayer

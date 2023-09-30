@@ -18,7 +18,7 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        ResetGame();
+        // Dont start Game BY default
     }
 
     // Inputs
@@ -50,7 +50,6 @@ public class GameController : MonoBehaviour
 
     private void ClickedTile()
     {
-        Debug.Log("CLICKED");
         if (StateController.Instance.State != State.Playing) return;
 
         Tiletype tiletype = Inputs.Controls.Main.Shift.IsPressed()?Tiletype.O:Tiletype.X;

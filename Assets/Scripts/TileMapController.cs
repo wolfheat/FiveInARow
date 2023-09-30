@@ -54,9 +54,7 @@ public class TileMapController : MonoBehaviour
         //Vector2 mousePosition = Mouse.current.position.value;
         Vector2 mousePosition = Inputs.Controls.Touch.TouchPosition.ReadValue<Vector2>();
 
-        Debug.Log("MousePosition: "+ mousePosition);
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePosition);
-        Debug.Log("WorldPosition: "+ worldPos);
 
         // Get Clicked Index
         Vector3Int tilePos = tilemap.WorldToCell(worldPos);
@@ -64,7 +62,7 @@ public class TileMapController : MonoBehaviour
 
         if (IndexIsOutOfBounds(clickedIndex))
         {
-            Debug.Log("Index OOB: "+ clickedIndex);
+            //Debug.Log("Index OOB: "+ clickedIndex);
             return;
         }
 
@@ -72,7 +70,7 @@ public class TileMapController : MonoBehaviour
         TileBase clickedTile = tilemap.GetTile(clickedIndex);
         if (TileIsOccupied(clickedTile))
         {
-            Debug.Log("Tile Occupied");
+            //Debug.Log("Tile Occupied");
 
             return;
         }
