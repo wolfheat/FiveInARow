@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] GameLobby gameLobby;
     [SerializeField] GameButton lobbyButtonPrefab;
     [SerializeField] GameObject gameHolder;
+    [SerializeField] ChangeNameController changeNameController;
+    [SerializeField] TextMeshProUGUI playerName;
 
     private GameButton[] gameButtons;
 
@@ -45,6 +48,17 @@ public class LobbyUI : MonoBehaviour
     {
         Debug.Log("Request Join Game: "+ LobbyCode);
         gameLobby.JoinLobbyByLobbyCodeAsync(LobbyCode);
+    }
+    
+    public void ChangeNameClicked()
+    {
+        changeNameController.gameObject.SetActive(true);
+    }
+    
+    public void UpdatePlayerName(string newName)
+    {
+        playerName.text = newName;
+        gameLobby.SetPlayerName(newName);
     }
 
 

@@ -9,11 +9,13 @@ using UnityEngine.InputSystem;
 
 public class GameLobby : MonoBehaviour
 {
-
+    [SerializeField] bool UpdatePolling = true;
     private Lobby joinedLobby;
     private Lobby hostLobby;
     private float heartBeatTimer = 0;
-    private const float HeartBeatTime = 15;
+    private float pollingTimer = 0;
+    private const float HeartBeatTime = 15f;
+    private const float PollingTime = 1.5f;
     private string playerName = "Johan";
 
     private async void Start()
@@ -38,6 +40,7 @@ public class GameLobby : MonoBehaviour
     private void Update()
     {
         HandleHeartbeat();
+        HandleUpdatePolling();
     }
 
     private void HandleHeartbeat()
@@ -50,7 +53,23 @@ public class GameLobby : MonoBehaviour
             heartBeatTimer -= HeartBeatTime;
         }
     }
+    private void HandleUpdatePolling()
+    {
+        if (!UpdatePolling || joinedLobby == null) return;
 
+        pollingTimer += Time.deltaTime;
+        if(pollingTimer >= PollingTime)
+        {
+            DoUpdatePolling();
+            pollingTimer -= PollingTime;
+        }
+    }
+
+    private async void DoUpdatePolling()
+    {
+        Lobby lobby = await LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
+        joinedLobby = lobby;
+    }
     private async void DoHeartBeat()
     {
         await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
@@ -168,6 +187,32 @@ public class GameLobby : MonoBehaviour
         }
     }
     
+    public void SetPlayerName(string name)
+    {
+        playerName = name;
+        // Dont let player set new name when in lobby so no need to update
+        //UpdatePlayerNameAsync();
+    }
+
+    private async void UpdatePlayerNameAsync()
+    {
+        if (joinedLobby == null) return;
+
+        try
+        {
+            await LobbyService.Instance.UpdatePlayerAsync(joinedLobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
+            {
+                Data = new Dictionary<string, PlayerDataObject> {
+                {"PlayerName",new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName) }
+            }
+            });
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.Log(e);
+        }
+    }
+
     private Player GetPlayer()
     {
         return new Player

@@ -20,6 +20,8 @@ DEVLOG FOR - FIVE IN A ROW
 		* Added clamp for camera so it stays inside game area
 29/9	* Added Unity Lobby
 		* Added Lobby/Game Lobby UI
+		* Player Can change Name, leave lobby
+
 
 
 		TODO
