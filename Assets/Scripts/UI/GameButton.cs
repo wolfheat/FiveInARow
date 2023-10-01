@@ -13,13 +13,16 @@ public class GameButton : MonoBehaviour
         gameText.text = lobbyName;
     }
 
-    public void SetLobby(Lobby lob)
+    public void SetLobby(Lobby lobby)
     {
-        Lobby = lob;
+        Lobby = lobby;
+        SetText(lobby.Name);
+        Debug.Log("Setting LobbyId: "+Lobby.Id);
     }
     
     public void RequestJoinGame()
     {
-        FindObjectOfType<LobbyUI>().JoinGame(Lobby.LobbyCode);
+        Debug.Log("Trying to join Game with LobbyId: " + Lobby.Id);
+        FindObjectOfType<LobbyUI>().JoinGameById(Lobby.Id);
     }
 }

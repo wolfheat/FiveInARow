@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Services.Authentication;
@@ -9,19 +10,19 @@ using UnityEngine.InputSystem;
 
 public class GameLobby : MonoBehaviour
 {
-    [SerializeField] bool UpdatePolling = true;
-    private Lobby joinedLobby;
+    [SerializeField] bool UseUpdatePolling = true;
+    public Lobby JoinedLobby { get; private set; }
     private Lobby hostLobby;
     private float heartBeatTimer = 0;
     private float pollingTimer = 0;
     private const float HeartBeatTime = 15f;
     private const float PollingTime = 1.5f;
-    private string playerName = "Johan";
+    private string playerName = "RandomName";
+    public static Action<Lobby> Polling;
+    public static Action<List<Lobby>> PollingGameList;
 
     private async void Start()
     {
-        playerName = "Johan" + Random.Range(0,100).ToString();
-
         await UnityServices.InitializeAsync();
 
 
@@ -29,9 +30,6 @@ public class GameLobby : MonoBehaviour
         {
             Debug.Log("Signed In " + AuthenticationService.Instance.PlayerId);
         };
-
-        Inputs.Controls.Main.L.performed += CreateLobby;
-        Inputs.Controls.Main.M.performed += ListLobbies;
 
         //Signs in and creates new Account
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -55,44 +53,41 @@ public class GameLobby : MonoBehaviour
     }
     private void HandleUpdatePolling()
     {
-        if (!UpdatePolling || joinedLobby == null) return;
+        if (!UseUpdatePolling) return;
 
         pollingTimer += Time.deltaTime;
+        //Debug.Log("Polling timer: "+pollingTimer);
         if(pollingTimer >= PollingTime)
         {
-            DoUpdatePolling();
             pollingTimer -= PollingTime;
+            if(JoinedLobby != null)
+            {
+                DoUpdatePolling();
+                return;
+            }
+            UpdateLobbiesListAsync();
         }
     }
 
     private async void DoUpdatePolling()
     {
-        Lobby lobby = await LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
-        joinedLobby = lobby;
+        Debug.Log("Polling Joined Lobby");
+        Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
+        JoinedLobby = lobby;
+        Polling.Invoke(lobby);
     }
     private async void DoHeartBeat()
     {
         await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
     }
 
-    private void CreateLobby(InputAction.CallbackContext context)
-    {
-        Debug.Log("Calling Create Lobby.");
-        CreateLobbyAsync();
-    }
-    
-    private void ListLobbies(InputAction.CallbackContext context)
-    {
-        Debug.Log("Calling Update Lobbies.");
-        ListLobbiesAsync();
-    }
 
-    private async void ListLobbiesAsync()
+    private async void UpdateLobbiesListAsync()
     {
         try
         {
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
-            LobbyUI.Instance.UpdateLobbyButtons(queryResponse.Results.ToList());
+            PollingGameList.Invoke(queryResponse.Results);
         }
         catch (LobbyServiceException e)
         {
@@ -109,15 +104,38 @@ public class GameLobby : MonoBehaviour
             };
 
             Lobby lobby = await LobbyService.Instance.QuickJoinLobbyAsync(quickJoinLobbyOptions);
-            joinedLobby = lobby;
-            UIController.Instance.JoinGameLobby(joinedLobby);
+            JoinedLobby = lobby;
+            UIController.Instance.JoinGameLobby(JoinedLobby);
         }
         catch (LobbyServiceException e)
         {
             Debug.Log(e);
+            // If there is no free lobby to join create a new one
+            CreateLobbyAsync();
         }
     }
 
+    public async void JoinLobbyByLobbyIdAsync(string id)
+    {
+        try
+        {
+            JoinLobbyByIdOptions joinLobbyByIdOptions = new JoinLobbyByIdOptions
+            {
+                Player = GetPlayer()
+            };
+
+            Lobby lobby = await LobbyService.Instance.JoinLobbyByIdAsync(id, joinLobbyByIdOptions);
+            JoinedLobby = lobby;
+            UIController.Instance.JoinGameLobby(JoinedLobby);
+        }
+        catch (LobbyServiceException e)
+        {
+            //if(e.Message.)
+            UIController.Instance.ShowPopup("Invalid Code!");
+            Debug.Log(e);
+        }
+
+    }
     public async void JoinLobbyByLobbyCodeAsync(string lobbyCode)
     {
         try
@@ -128,11 +146,13 @@ public class GameLobby : MonoBehaviour
             };
 
             Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, joinLobbyByCodeOptions);
-            joinedLobby = lobby;
-            UIController.Instance.JoinGameLobby(joinedLobby);
+            JoinedLobby = lobby;
+            UIController.Instance.JoinGameLobby(JoinedLobby);
         }
         catch (LobbyServiceException e)
         {
+            //if(e.Message.)
+            UIController.Instance.ShowPopup("Invalid Code!");
             Debug.Log(e);
         }
     }
@@ -141,7 +161,7 @@ public class GameLobby : MonoBehaviour
     {
         try
         {
-            string lobbyName = "Private Lobby";
+            string lobbyName = "Private Game " + UnityEngine.Random.Range(0, 1000);
             int maxPlayers = 2;
             CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions
             {
@@ -153,8 +173,8 @@ public class GameLobby : MonoBehaviour
             Debug.Log("Created private Lobby "+lobbyName+", with max players: "+maxPlayers+ " JoinCode: "+lobby.LobbyCode);
 
             hostLobby = lobby;
-            joinedLobby = lobby;
-            UIController.Instance.JoinGameLobby(joinedLobby);
+            JoinedLobby = lobby;
+            UIController.Instance.JoinGameLobby(JoinedLobby);
         }
         catch (LobbyServiceException e)
         {
@@ -165,7 +185,7 @@ public class GameLobby : MonoBehaviour
     {
         try
         {
-            string lobbyName = "New Lobby ";
+            string lobbyName = "Game "+ UnityEngine.Random.Range(0,1000);
             int maxPlayers = 2;
 
             CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions {
@@ -175,32 +195,33 @@ public class GameLobby : MonoBehaviour
 
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers,createLobbyOptions);
 
-            Debug.Log("Created Lobby "+lobbyName+", with max players: "+maxPlayers);
+            Debug.Log("Created Lobby "+lobbyName+", with max players: "+maxPlayers+" LobbyCode: "+ lobby.LobbyCode);
             // Auto Join This Game If you are the creator
             hostLobby = lobby;
-            joinedLobby = lobby;
-            UIController.Instance.JoinGameLobby(joinedLobby);
+            JoinedLobby = lobby;
+            UIController.Instance.JoinGameLobby(JoinedLobby);
         }
         catch (LobbyServiceException e)
         {
+            UIController.Instance.ShowPopup("Could not create game.");
             Debug.Log(e);
         }
     }
     
     public void SetPlayerName(string name)
     {
+        Debug.Log("Setting Player Name in gamelobby to: "+name);    
         playerName = name;
-        // Dont let player set new name when in lobby so no need to update
-        //UpdatePlayerNameAsync();
     }
 
+    // Only Activate this if you want player to be able to set name when inside a lobby
     private async void UpdatePlayerNameAsync()
     {
-        if (joinedLobby == null) return;
+        if (JoinedLobby == null) return;
 
         try
         {
-            await LobbyService.Instance.UpdatePlayerAsync(joinedLobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
+            await LobbyService.Instance.UpdatePlayerAsync(JoinedLobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
             {
                 Data = new Dictionary<string, PlayerDataObject> {
                 {"PlayerName",new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName) }
@@ -213,33 +234,35 @@ public class GameLobby : MonoBehaviour
         }
     }
 
-    private Player GetPlayer()
-    {
-        return new Player
-        {
-            Data = new Dictionary<string, PlayerDataObject>{
-                { "playerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName)}
-            }
-        };
-    }
 
     public async void LeaveLobbyAsync()
     {
         try
         {
-            await LobbyService.Instance.RemovePlayerAsync(joinedLobby.Id, AuthenticationService.Instance.PlayerId);
-            joinedLobby = null;
-            UIController.Instance.ShowMainLobby();
+            await LobbyService.Instance.RemovePlayerAsync(JoinedLobby.Id, AuthenticationService.Instance.PlayerId);
+            JoinedLobby = null;
             Debug.Log("Player left game lobby");
         }
         catch (LobbyServiceException e)
         {
+            Debug.Log("Player was not in that lobby");
             Debug.Log(e);
+        }
+        finally
+        {
+            UIController.Instance.ShowMainLobby();
         }
     }
 
-    public void UpdateLobby()
+    private Player GetPlayer()
     {
-        ListLobbiesAsync();
+        Debug.Log("Getting player name and it is: "+playerName);
+        return new Player
+        {
+            Data = new Dictionary<string, PlayerDataObject>{
+                { "PlayerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName)}
+            }
+        };
     }
+
 }

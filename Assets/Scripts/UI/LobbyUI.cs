@@ -10,6 +10,7 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] GameButton lobbyButtonPrefab;
     [SerializeField] GameObject gameHolder;
     [SerializeField] ChangeNameController changeNameController;
+    [SerializeField] JoinPrivateGameController joinPrivateGameController;
     [SerializeField] TextMeshProUGUI playerName;
 
     private GameButton[] gameButtons;
@@ -23,7 +24,20 @@ public class LobbyUI : MonoBehaviour
         Instance = this;
 
         CreateAllGameButtons();
+
+        UpdatePlayerName("Player"+ UnityEngine.Random.Range(0,1000));
     }
+
+    private void OnEnable()
+    {
+        GameLobby.PollingGameList += UpdateLobbyButtons;
+    }
+    
+    private void OnDisable()
+    {
+        GameLobby.PollingGameList -= UpdateLobbyButtons;
+    }
+
 
     public void CreateGame(bool isPrivate)
     {
@@ -41,10 +55,15 @@ public class LobbyUI : MonoBehaviour
     {
         Debug.Log("Request Join Private Game");
         // Show Screen for putting in ID
-        //gameLobby.JoinPrivateLobbyAsync();
+        joinPrivateGameController.gameObject.SetActive(true);
+        joinPrivateGameController.Reset();
     }
 
-    public void JoinGame(String LobbyCode)
+    public void JoinGameById(string id)
+    {
+        gameLobby.JoinLobbyByLobbyIdAsync(id);
+    }
+    public void JoinGame(string LobbyCode)
     {
         Debug.Log("Request Join Game: "+ LobbyCode);
         gameLobby.JoinLobbyByLobbyCodeAsync(LobbyCode);
@@ -58,6 +77,7 @@ public class LobbyUI : MonoBehaviour
     public void UpdatePlayerName(string newName)
     {
         playerName.text = newName;
+        changeNameController.SetName(newName);
         gameLobby.SetPlayerName(newName);
     }
 
@@ -76,7 +96,7 @@ public class LobbyUI : MonoBehaviour
 
     public void UpdateLobbyButtons(List<Lobby> lobbies)
     {
-        Debug.Log("Updating Lobby UI with lobbies: "+lobbies.Count);
+        Debug.Log("Updating Lobby UI with "+ lobbies.Count + " lobbies: ");
 
         for (int i = 0; i < AmountOfGameButtons; i++)
         {
@@ -87,7 +107,6 @@ public class LobbyUI : MonoBehaviour
             }
             // Update Button
             gameButtons[i].gameObject.SetActive(true);
-            gameButtons[i].SetText(lobbies[i].Name);
             gameButtons[i].SetLobby(lobbies[i]);
         }
     }

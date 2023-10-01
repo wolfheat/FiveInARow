@@ -18,11 +18,17 @@ DEVLOG FOR - FIVE IN A ROW
 		* Touch Input added
 		* Game is now draggable, had some issues with touch movement scaling 
 		* Added clamp for camera so it stays inside game area
-29/9	* Added Unity Lobby
+30/9	* Added Unity Lobby
 		* Added Lobby/Game Lobby UI
 		* Player Can change Name, leave lobby
+1/10	* Players can Create and Join Private Games by Code
+		* Changed color scheme
+		* Clicking games now joins them (needed to use ID since lobbyCode is only for members)
+		* Made lobby update players with timer
+		* Made game players info and players with timer
+		* Entering game Lobby and exiting makes double connections to main lobby? Issue fixed dod not remove Action listener i onDisable.
 
-
+		* Make Main lobby only show games with free spots
 
 		TODO
 		* Inplement server code for multiplayer

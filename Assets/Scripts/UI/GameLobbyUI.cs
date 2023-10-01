@@ -1,3 +1,5 @@
+using System;
+using TMPro;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
@@ -7,6 +9,8 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] GameObject playerButtonHolder;
     [SerializeField] GameObject startButton;
     [SerializeField] GameLobby gameLobby;
+    [SerializeField] TextMeshProUGUI lobbyCodeText;
+    [SerializeField] TextMeshProUGUI lobbyNameText;
 
     private string activeLobbyCode = string.Empty;
     private Lobby activeLobby;
@@ -14,11 +18,32 @@ public class GameLobbyUI : MonoBehaviour
     private PlayerButton[] playerButtons;
     private const int AmountOfPlayers = 2;
 
-    private void Start()
+    private void Init()
     {
         CreatePlayerButtons();
         startButton.gameObject.SetActive(false);
-        gameObject.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        GameLobby.Polling += UpdateLobby;
+    }
+    
+    private void OnDisable()
+    {
+        GameLobby.Polling -= UpdateLobby;
+    }
+
+    private void PollingUpdate(Lobby obj)
+    {
+
+        Debug.Log("Polling recieved, update players and text");
+        UpdatePlayers();
+    }
+
+    private void TickLobby()
+    {
+        throw new NotImplementedException();
     }
 
     private void CreatePlayerButtons()
@@ -35,10 +60,8 @@ public class GameLobbyUI : MonoBehaviour
 
     public void UpdatePlayers()
     {
-        Debug.Log("Updating Players in Game Lobby.");
-        Debug.Log("lobbyCode: "+activeLobbyCode);
-        Debug.Log("Amount of players: "+ activeLobby?.Players.Count);
-        
+        if(playerButtons ==null) Init();
+
         if (activeLobby == null) return;
 
         int actualPlayersAmount = activeLobby.Players.Count;
@@ -52,18 +75,24 @@ public class GameLobbyUI : MonoBehaviour
             }
             // Update Button
             playerButtons[i].gameObject.SetActive(true);
-            playerButtons[i].SetText(activeLobby.Players[i].Data["playerName"].Value);
-            //playerButtons[i].SetText(activeLobby.Players[i].playerName);
+            playerButtons[i].SetText(activeLobby.Players[i].Data["PlayerName"].Value);
+            //Debug.Log("Updating playername to: "+ activeLobby.Players[i].Data["PlayerName"].Value);
         }
     }
 
-    public void SetLobby(Lobby lobby)
+    public void UpdateLobby(Lobby lobby)
     {
         activeLobby = lobby;
-        activeLobbyCode = lobby.LobbyCode;
-        startButton.gameObject.SetActive(true);
+        UpdateLobbyText();
+        UpdatePlayers();
     }
-    
+
+    private void UpdateLobbyText()
+    {
+        lobbyNameText.text = activeLobby.Name;
+        lobbyCodeText.text = "Join Code: "+activeLobby.LobbyCode;
+    }
+
     public void RequestStartGame()
     {
         Debug.Log("Start Game Pressed");

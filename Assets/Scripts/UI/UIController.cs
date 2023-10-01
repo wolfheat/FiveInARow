@@ -6,6 +6,7 @@ public class UIController : MonoBehaviour
     [SerializeField] GameLobbyUI gameLobbyUI;
     [SerializeField] LobbyUI lobbyUI;
     [SerializeField] GameLobby gameLobby;
+    [SerializeField] MessagePopup generalMessagePopup;
 
     public static UIController Instance { get; private set; }
     
@@ -24,16 +25,18 @@ public class UIController : MonoBehaviour
 
         lobbyUI.gameObject.SetActive(false);
 
+        gameLobbyUI.UpdateLobby(lobby);
         gameLobbyUI.gameObject.SetActive(true);
-        gameLobbyUI.SetLobby(lobby);
-        gameLobbyUI.UpdatePlayers();
     }
 
     public void ShowMainLobby()
     {
         gameLobbyUI.gameObject.SetActive(false);
-
         lobbyUI.gameObject.SetActive(true);
-        gameLobby.UpdateLobby();
+    }
+
+    public void ShowPopup(string message)
+    {
+        generalMessagePopup.ShowMessage(message);
     }
 }
