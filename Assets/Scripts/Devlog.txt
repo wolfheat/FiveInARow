@@ -27,6 +27,10 @@ DEVLOG FOR - FIVE IN A ROW
 		* Made lobby update players with timer
 		* Made game players info and players with timer
 		* Entering game Lobby and exiting makes double connections to main lobby? Issue fixed dod not remove Action listener i onDisable.
+		* BUILD: ZIP 29.7k
+		* Added blinker light that shows when Polling is called in Main Lobby and Game lobby
+		* Private games wont show up in the list anymore
+
 
 		* Make Main lobby only show games with free spots
 

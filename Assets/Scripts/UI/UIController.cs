@@ -24,9 +24,8 @@ public class UIController : MonoBehaviour
         // Only creator sets this lobbycode how to handle this
 
         lobbyUI.gameObject.SetActive(false);
-
-        gameLobbyUI.UpdateLobby(lobby);
         gameLobbyUI.gameObject.SetActive(true);
+        gameLobbyUI.UpdateLobby(lobby);
     }
 
     public void ShowMainLobby()
@@ -38,5 +37,14 @@ public class UIController : MonoBehaviour
     public void ShowPopup(string message)
     {
         generalMessagePopup.ShowMessage(message);
+    }
+    public void ExitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+    Application.Quit();
+#endif
+
     }
 }

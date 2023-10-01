@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using UnityEditor.Search;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class GameLobby : MonoBehaviour
 {
@@ -43,6 +42,7 @@ public class GameLobby : MonoBehaviour
 
     private void HandleHeartbeat()
     {
+        //Debug.Log("Handle Heart beat: Hostlobby: "+hostLobby+" heartbeattimer: "+heartBeatTimer);
         if (hostLobby == null) return;
         heartBeatTimer += Time.deltaTime;
         if(heartBeatTimer>= HeartBeatTime)
@@ -71,13 +71,13 @@ public class GameLobby : MonoBehaviour
 
     private async void DoUpdatePolling()
     {
-        Debug.Log("Polling Joined Lobby");
         Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
         JoinedLobby = lobby;
-        Polling.Invoke(lobby);
+        Polling?.Invoke(lobby);
     }
     private async void DoHeartBeat()
     {
+        Debug.Log("Doing Heart beat");
         await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
     }
 
@@ -87,7 +87,7 @@ public class GameLobby : MonoBehaviour
         try
         {
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
-            PollingGameList.Invoke(queryResponse.Results);
+            PollingGameList?.Invoke(queryResponse.Results);
         }
         catch (LobbyServiceException e)
         {
@@ -241,6 +241,7 @@ public class GameLobby : MonoBehaviour
         {
             await LobbyService.Instance.RemovePlayerAsync(JoinedLobby.Id, AuthenticationService.Instance.PlayerId);
             JoinedLobby = null;
+            hostLobby = null;
             Debug.Log("Player left game lobby");
         }
         catch (LobbyServiceException e)

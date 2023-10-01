@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Services.Lobbies.Models;
@@ -7,11 +6,12 @@ using UnityEngine;
 public class LobbyUI : MonoBehaviour
 {
     [SerializeField] GameLobby gameLobby;
-    [SerializeField] GameButton lobbyButtonPrefab;
+    [SerializeField] GameButton gameButtonPrefab;
     [SerializeField] GameObject gameHolder;
     [SerializeField] ChangeNameController changeNameController;
     [SerializeField] JoinPrivateGameController joinPrivateGameController;
     [SerializeField] TextMeshProUGUI playerName;
+    [SerializeField] Blinker blinker;
 
     private GameButton[] gameButtons;
 
@@ -42,7 +42,9 @@ public class LobbyUI : MonoBehaviour
     public void CreateGame(bool isPrivate)
     {
         Debug.Log("Request Create Game private = "+isPrivate);
-        gameLobby.CreateLobbyAsync();
+        if(!isPrivate) gameLobby.CreateLobbyAsync();
+        else gameLobby.CreatePrivateLobbyAsync();
+
     }
 
     public void JoinAnyGame()
@@ -87,7 +89,7 @@ public class LobbyUI : MonoBehaviour
         gameButtons = new GameButton[AmountOfGameButtons];
         for (int i = 0; i< AmountOfGameButtons; i++)
         {
-            GameButton gameButton = Instantiate(lobbyButtonPrefab, gameHolder.transform);
+            GameButton gameButton = Instantiate(gameButtonPrefab, gameHolder.transform);
             gameButtons[i] = gameButton;    
             gameButton.gameObject.SetActive(false);
         }
@@ -109,6 +111,7 @@ public class LobbyUI : MonoBehaviour
             gameButtons[i].gameObject.SetActive(true);
             gameButtons[i].SetLobby(lobbies[i]);
         }
+        blinker.StartBlink();
     }
 
 }

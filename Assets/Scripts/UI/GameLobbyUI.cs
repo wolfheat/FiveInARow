@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -11,6 +12,7 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] GameLobby gameLobby;
     [SerializeField] TextMeshProUGUI lobbyCodeText;
     [SerializeField] TextMeshProUGUI lobbyNameText;
+    [SerializeField] Blinker blinker;
 
     private string activeLobbyCode = string.Empty;
     private Lobby activeLobby;
@@ -85,6 +87,8 @@ public class GameLobbyUI : MonoBehaviour
         activeLobby = lobby;
         UpdateLobbyText();
         UpdatePlayers();
+
+        blinker.StartBlink();
     }
 
     private void UpdateLobbyText()

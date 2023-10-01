@@ -13,11 +13,11 @@ public class JoinPrivateGameController : MonoBehaviour
     {
         if (!ValidateNameLength()) return;
 
-        string lobbyID = inputField.text;
-
+        string lobbyCode = inputField.text;
         //Try join game
-        Debug.Log("Trying to join Lobby with ID: "+lobbyID);
-        gameLobby.JoinLobbyByLobbyCodeAsync(lobbyID);
+        Debug.Log("Trying to join Lobby with ID: "+lobbyCode);
+        gameLobby.JoinLobbyByLobbyCodeAsync(lobbyCode);
+        gameObject.SetActive(false);
     }
     
     public void RequestBackToLobby()
@@ -32,8 +32,8 @@ public class JoinPrivateGameController : MonoBehaviour
 
     private bool ValidateNameLength()
     {
-        Debug.Log("Checking Length of string: "+inputField.text.Length);
-        UIController.Instance.ShowPopup("Code needs 6 digits!");
+        if(inputField.text.Length != 6)
+            UIController.Instance.ShowPopup("Code needs 6 digits!");
         return (inputField.text.Length == 6);
     }
 }
