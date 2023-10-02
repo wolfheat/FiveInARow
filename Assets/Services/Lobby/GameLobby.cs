@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -44,10 +45,9 @@ public class GameLobby : MonoBehaviour
 
     private void HandleHeartbeat()
     {
-        //Debug.Log("Handle Heart beat: Hostlobby: "+hostLobby+" heartbeattimer: "+heartBeatTimer);
-        if (hostLobby == null) return;
+        if (hostLobby == null || StateController.Instance.State != State.Lobby) return;
         heartBeatTimer += Time.deltaTime;
-        if(heartBeatTimer>= HeartBeatTime)
+        if(heartBeatTimer >= HeartBeatTime)
         {
             DoHeartBeat();
             heartBeatTimer -= HeartBeatTime;
@@ -83,8 +83,15 @@ public class GameLobby : MonoBehaviour
         if (relayCode != "0")
         {
             // Game has a relay code and this user is not Host (Host joins automatically)
-            if(!IsLobbyHost())
+            NetworkCommunicator.PlayerIndex = 0;
+            if (!IsLobbyHost())
+            {
                 GameRelay.Instance.JoinRelayAsync(relayCode);
+                UIController.Instance.SetAsServer(false);
+                NetworkCommunicator.PlayerIndex = 1;
+            }
+            else
+                UIController.Instance.SetAsServer();
 
             JoinedLobby = null;
 
@@ -311,6 +318,8 @@ public class GameLobby : MonoBehaviour
 
     private bool IsLobbyHost()
     {
-        return true;
+        Debug.Log("Checking if player is Host, first player name is: "+ JoinedLobby.Players[0].Data["PlayerName"].Value+" This player: "+playerName+" : "+(JoinedLobby.Players[0].Data["PlayerName"].Value == playerName));
+
+        return JoinedLobby.Players[0].Data["PlayerName"].Value == playerName;
     }
 }

@@ -58,12 +58,17 @@ public class GameLobbyUI : MonoBehaviour
             playerButtons[i] = playerButton;
             playerButton.gameObject.SetActive(false);
         }
-        Debug.Log("Created All PlayerButton, all are hidden amount: "+AmountOfPlayers);
+        
+    }
+
+    private bool IsLobbyHost()
+    {
+        return true;
     }
 
     public void UpdatePlayers()
     {
-        if(playerButtons ==null) Init();
+        if(playerButtons == null) Init();
 
         if (activeLobby == null) return;
 
@@ -81,6 +86,21 @@ public class GameLobbyUI : MonoBehaviour
             playerButtons[i].SetText(activeLobby.Players[i].Data["PlayerName"].Value);
             //Debug.Log("Updating playername to: "+ activeLobby.Players[i].Data["PlayerName"].Value);
         }
+
+        ShowStartButtonIfHostAndFull();
+    }
+
+    private void ShowStartButtonIfHostAndFull()
+    {
+        if (JoinedLobbyIsFull() && IsLobbyHost())
+            startButton.gameObject.SetActive(true);
+        else 
+            startButton.gameObject.SetActive(false);
+    }
+
+    private bool JoinedLobbyIsFull()
+    {
+        return AmountOfPlayers == gameLobby.JoinedLobby?.Players?.Count;
     }
 
     public void UpdateLobby(Lobby lobby)

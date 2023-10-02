@@ -49,7 +49,7 @@ public class TileMapController : MonoBehaviour
     // Actions
     public void RequestChangeTile(Tiletype t)
     {
-        Tile ChangeToType = t == Tiletype.X ? X : O;
+        Tile changeToType = TileTypeToTile(t);
         // Get Mouse Position
         //Vector2 mousePosition = Mouse.current.position.value;
         Vector2 mousePosition = Inputs.Controls.Touch.TouchPosition.ReadValue<Vector2>();
@@ -66,8 +66,25 @@ public class TileMapController : MonoBehaviour
             return;
         }
 
+        ChangeTileAtIndex(clickedIndex, changeToType);
+
+    }
+
+    private Tile TileTypeToTile(Tiletype t)
+    {
+        return t == Tiletype.X ? X : O;
+    }
+
+    public void ChangeTileAtIndex(Vector3Int clickedIndex, Tiletype tileType)
+    {
+        ChangeTileAtIndex(clickedIndex, TileTypeToTile(tileType));
+    }
+
+    public void ChangeTileAtIndex(Vector3Int clickedIndex, Tile changeToType)
+    {
         // Check if tile is occupied
         TileBase clickedTile = tilemap.GetTile(clickedIndex);
+
         if (TileIsOccupied(clickedTile))
         {
             //Debug.Log("Tile Occupied");
@@ -76,13 +93,13 @@ public class TileMapController : MonoBehaviour
         }
 
         // Change the tile if free
-        tilemap.SetTile(clickedIndex,ChangeToType);
+        tilemap.SetTile(clickedIndex, changeToType);
 
         // Expand game area
         ExpandTileMapIfNewMarkerIsToCloseToBorder(clickedIndex);
 
         // Check for game complete
-        if (winEvaluator.CheckGameComplete(tilemap,vacant))
+        if (winEvaluator.CheckGameComplete(tilemap, vacant))
             gameController.HandleWin(winEvaluator.CountedTile.name);
     }
 

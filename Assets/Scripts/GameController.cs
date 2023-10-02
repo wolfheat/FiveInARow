@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviour
 {
@@ -64,6 +65,26 @@ public class GameController : MonoBehaviour
             cameraController.ZoomIn();
     }
 
+    public void PlaceMarkerRandom(int playerIndex)
+    {
+        Vector3Int pos = new Vector3Int(Random.Range(0,10), Random.Range(0, 10),1);
+        Debug.Log("Place random marker at "+pos+" playerindex: "+playerIndex);
+        tileMapController.ChangeTileAtIndex(pos,playerIndex==0?Tiletype.X:Tiletype.O);
+    }
+    
+    public void PlaceMarkerByTiletype(Vector3Int pos, Tiletype tileType = Tiletype.X)
+    {
+
+        Debug.Log("Place marker at "+pos+" "+tileType);
+        tileMapController.ChangeTileAtIndex(pos,tileType);
+    }
+    public void PlaceMarkerByPlayerIndex(Vector3Int pos, int playerIndex)
+    {
+        Tiletype tileType = playerIndex == 0?Tiletype.X:Tiletype.O;
+        Debug.Log("Place marker at "+pos+" "+tileType);
+        tileMapController.ChangeTileAtIndex(pos,tileType);
+    }
+    
     private void ClickedTile()
     {
         if (StateController.Instance.State != State.Playing) return;
@@ -90,4 +111,11 @@ public class GameController : MonoBehaviour
 
     }
 
+    public string GetRandomPositionString()
+    {
+        Vector3Int pos = new Vector3Int(Random.Range(0, 10), Random.Range(0, 10), 1);
+        string posAsString = ""+pos.x+pos.y;
+        Debug.Log("Vector3Int as string: "+posAsString);
+        return posAsString;
+    }
 }

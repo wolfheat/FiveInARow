@@ -1,3 +1,4 @@
+using TMPro;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class UIController : MonoBehaviour
     [SerializeField] LobbyUI lobbyUI;
     [SerializeField] GameLobby gameLobby;
     [SerializeField] MessagePopup generalMessagePopup;
+    [SerializeField] TextMeshProUGUI serverClientText;
 
     public static UIController Instance { get; private set; }
     
@@ -38,6 +40,11 @@ public class UIController : MonoBehaviour
     {
         gameLobbyUI.gameObject.SetActive(false);
         lobbyUI.gameObject.SetActive(false);
+    }
+    
+    public void SetAsServer(bool isServer = true)
+    {
+        serverClientText.text = isServer ? "Server" : "Client";
     }
 
     public void ShowPopup(string message)
