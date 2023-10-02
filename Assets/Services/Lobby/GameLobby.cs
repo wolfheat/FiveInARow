@@ -10,13 +10,16 @@ public class GameLobby : MonoBehaviour
 {
     [SerializeField] bool UseUpdatePolling = true;
     public Lobby JoinedLobby { get; private set; }
+    public bool IsHost { get; private set; }
     private Lobby hostLobby;
     private float heartBeatTimer = 0;
     private float pollingTimer = 0;
     private const float HeartBeatTime = 15f;
     private const float PollingTime = 1.5f;
     private string playerName = "RandomName";
+    private string RELAY_CODE = "RELAY_CODE";
     public static Action<Lobby> Polling;
+    public static Action GameStarted;
     public static Action<List<Lobby>> PollingGameList;
 
     private async void Start()
@@ -73,6 +76,22 @@ public class GameLobby : MonoBehaviour
         Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
         JoinedLobby = lobby;
         Polling?.Invoke(lobby);
+
+        string relayCode = JoinedLobby.Data[RELAY_CODE].Value;
+
+        // Check if game is set to start
+        if (relayCode != "0")
+        {
+            // Game has a relay code and this user is not Host (Host joins automatically)
+            if(!IsLobbyHost())
+                GameRelay.Instance.JoinRelayAsync(relayCode);
+
+            JoinedLobby = null;
+
+            // Leave Lobby? Keep Lobby?
+
+            GameStarted?.Invoke();
+        }
     }
     private async void DoHeartBeat()
     {
@@ -189,7 +208,10 @@ public class GameLobby : MonoBehaviour
 
             CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions {
                 IsPrivate = false,
-                Player = GetPlayer()
+                Player = GetPlayer(),
+                Data = new Dictionary<string, DataObject> { 
+                    {RELAY_CODE, new DataObject(DataObject.VisibilityOptions.Member,"0")} 
+                }
             };
 
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers,createLobbyOptions);
@@ -265,4 +287,30 @@ public class GameLobby : MonoBehaviour
         };
     }
 
+    public async void StartGameAsync()
+    {
+        if (!IsLobbyHost()) return;
+        try
+        {
+            Debug.Log("Host Starts Game");
+
+            // Create Relay
+            string relayCode = await GameRelay.Instance.CreateRelayAsync();
+
+            Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(JoinedLobby.Id, new UpdateLobbyOptions
+            {
+                Data = new Dictionary<string, DataObject>() {
+                    { RELAY_CODE, new DataObject(DataObject.VisibilityOptions.Member, relayCode)} 
+                }
+            });
+        }
+        catch (LobbyServiceException e){
+            Debug.Log(e);
+        }
+    }
+
+    private bool IsLobbyHost()
+    {
+        return true;
+    }
 }

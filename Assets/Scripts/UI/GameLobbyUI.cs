@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using TMPro;
+using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
@@ -100,8 +101,9 @@ public class GameLobbyUI : MonoBehaviour
     public void RequestStartGame()
     {
         Debug.Log("Start Game Pressed");
+        gameLobby.StartGameAsync();
     }
-    
+
     public void RequestReturnToLobby()
     {
         Debug.Log("Return to Lobby Pressed");

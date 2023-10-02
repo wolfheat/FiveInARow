@@ -14,6 +14,22 @@ public class GameController : MonoBehaviour
         Inputs.Controls.Main.Scroll.started += Scroll;
         Inputs.Controls.Main.Space.started += SpaceInput;
         SwipeController.Clicked += ClickedTile;
+        GameLobby.GameStarted += GameStarted;
+    }
+    
+    private void OnDisable()
+    {
+        Inputs.Controls.Main.Scroll.started -= Scroll;
+        Inputs.Controls.Main.Space.started -= SpaceInput;
+        SwipeController.Clicked -= ClickedTile;
+        GameLobby.GameStarted -= GameStarted;
+    }
+
+    private void GameStarted()
+    {
+        Debug.Log("Game started");
+        UIController.Instance.HideAllLobbies();
+        ResetGame();
     }
 
     private void Start()

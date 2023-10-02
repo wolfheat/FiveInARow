@@ -31,10 +31,11 @@ DEVLOG FOR - FIVE IN A ROW
 		* Added blinker light that shows when Polling is called in Main Lobby and Game lobby
 		* Private games wont show up in the list anymore
 		* Fixed scaling issues for UI
+2/10	* 		
 
-
+		* Make Game playable as multiplayer
+		* Set to android mode
 		* Have specific queries for games? Playeramount, spectators = overkill?
-
 
 		TODO
 		* Make Main lobby only show games with free spots

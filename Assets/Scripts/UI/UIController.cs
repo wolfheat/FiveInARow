@@ -33,6 +33,12 @@ public class UIController : MonoBehaviour
         gameLobbyUI.gameObject.SetActive(false);
         lobbyUI.gameObject.SetActive(true);
     }
+    
+    public void HideAllLobbies()
+    {
+        gameLobbyUI.gameObject.SetActive(false);
+        lobbyUI.gameObject.SetActive(false);
+    }
 
     public void ShowPopup(string message)
     {
