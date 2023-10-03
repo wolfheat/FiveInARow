@@ -33,6 +33,12 @@ DEVLOG FOR - FIVE IN A ROW
 		* Fixed scaling issues for UI
 2/10	* Added Relay		
 		* Relay can start game but the connection is not always there
+3/10	* Relay now sends position Vector and senderInfo
+		* Added log-window for troubleshooting
+		* Server/Client Header shown
+
+
+		* Determine when both players are connected
 
 		* Make Game playable as multiplayer
 		* Set to android mode

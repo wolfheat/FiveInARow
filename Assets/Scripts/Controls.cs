@@ -107,6 +107,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""N"",
+                    ""type"": ""Button"",
+                    ""id"": ""2e45a883-ede8-4a3d-83ec-36313998c256"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -219,6 +228,17 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""M"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d5aef8b5-18b1-4d17-a89e-9a9609ad293f"",
+                    ""path"": ""<Keyboard>/n"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""N"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -304,6 +324,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Main_Shift = m_Main.FindAction("Shift", throwIfNotFound: true);
         m_Main_L = m_Main.FindAction("L", throwIfNotFound: true);
         m_Main_M = m_Main.FindAction("M", throwIfNotFound: true);
+        m_Main_N = m_Main.FindAction("N", throwIfNotFound: true);
         // Touch
         m_Touch = asset.FindActionMap("Touch", throwIfNotFound: true);
         m_Touch_TouchPress = m_Touch.FindAction("TouchPress", throwIfNotFound: true);
@@ -379,6 +400,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Main_Shift;
     private readonly InputAction m_Main_L;
     private readonly InputAction m_Main_M;
+    private readonly InputAction m_Main_N;
     public struct MainActions
     {
         private @Controls m_Wrapper;
@@ -392,6 +414,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @Shift => m_Wrapper.m_Main_Shift;
         public InputAction @L => m_Wrapper.m_Main_L;
         public InputAction @M => m_Wrapper.m_Main_M;
+        public InputAction @N => m_Wrapper.m_Main_N;
         public InputActionMap Get() { return m_Wrapper.m_Main; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -428,6 +451,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @M.started += instance.OnM;
             @M.performed += instance.OnM;
             @M.canceled += instance.OnM;
+            @N.started += instance.OnN;
+            @N.performed += instance.OnN;
+            @N.canceled += instance.OnN;
         }
 
         private void UnregisterCallbacks(IMainActions instance)
@@ -459,6 +485,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @M.started -= instance.OnM;
             @M.performed -= instance.OnM;
             @M.canceled -= instance.OnM;
+            @N.started -= instance.OnN;
+            @N.performed -= instance.OnN;
+            @N.canceled -= instance.OnN;
         }
 
         public void RemoveCallbacks(IMainActions instance)
@@ -549,6 +578,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnShift(InputAction.CallbackContext context);
         void OnL(InputAction.CallbackContext context);
         void OnM(InputAction.CallbackContext context);
+        void OnN(InputAction.CallbackContext context);
     }
     public interface ITouchActions
     {

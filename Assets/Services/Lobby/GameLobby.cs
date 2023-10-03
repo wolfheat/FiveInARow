@@ -55,7 +55,7 @@ public class GameLobby : MonoBehaviour
     }
     private void HandleUpdatePolling()
     {
-        if (!UseUpdatePolling) return;
+        if (!UseUpdatePolling || StateController.Instance.State != State.Lobby) return;
 
         pollingTimer += Time.deltaTime;
         //Debug.Log("Polling timer: "+pollingTimer);
@@ -93,7 +93,7 @@ public class GameLobby : MonoBehaviour
             else
                 UIController.Instance.SetAsServer();
 
-            JoinedLobby = null;
+            //JoinedLobby = null;
 
             // Leave Lobby? Keep Lobby?
 
@@ -319,7 +319,7 @@ public class GameLobby : MonoBehaviour
     private bool IsLobbyHost()
     {
         Debug.Log("Checking if player is Host, first player name is: "+ JoinedLobby.Players[0].Data["PlayerName"].Value+" This player: "+playerName+" : "+(JoinedLobby.Players[0].Data["PlayerName"].Value == playerName));
-
+        Debug.Log("Amount of players in Lobby: "+ JoinedLobby.Players.Count);
         return JoinedLobby.Players[0].Data["PlayerName"].Value == playerName;
     }
 }
