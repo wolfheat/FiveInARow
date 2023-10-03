@@ -37,8 +37,9 @@ DEVLOG FOR - FIVE IN A ROW
 		* Added log-window for troubleshooting
 		* Server/Client Header shown
 
+		* Determine when both players are connected (figure out why connections fail sometimes)
+		* Separate logic so only server makes decisions, clients send requests
 
-		* Determine when both players are connected
 
 		* Make Game playable as multiplayer
 		* Set to android mode
