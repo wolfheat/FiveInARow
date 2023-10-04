@@ -35,11 +35,15 @@ public class UIController : MonoBehaviour
 
     public void JoinGameLobby(Lobby lobby)
     {
-        // Only creator sets this lobbycode how to handle this
+        ShowJoinedLobby();
+        gameLobbyUI.UpdateLobby(lobby);
+    }
 
+    public void ShowJoinedLobby()
+    {
+        StateController.Instance.State = State.Lobby;
         lobbyUI.gameObject.SetActive(false);
         gameLobbyUI.gameObject.SetActive(true);
-        gameLobbyUI.UpdateLobby(lobby);
     }
 
     public void ShowMainLobby()
@@ -97,6 +101,12 @@ public class UIController : MonoBehaviour
         serverClientText.text = isServer ? "Server" : "Client";
     }
 
+    public void BackToLobby()
+    {
+        Debug.Log("Requesting Back to lobby");
+        // Disconnect from server and show lobby
+        ShowJoinedLobby();
+    }
     public void ShowPopup(string message)
     {
         generalMessagePopup.ShowMessage(message);
@@ -113,6 +123,7 @@ public class UIController : MonoBehaviour
 
     public void ShowWaitingForAllPlayers(bool show = true)
     {
+        StateController.Instance.State = State.Paused;
         infoController.WaitingForPlayers(show);
     }
 }

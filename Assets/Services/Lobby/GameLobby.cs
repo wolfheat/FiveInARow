@@ -95,6 +95,7 @@ public class GameLobby : MonoBehaviour
                 UIController.Instance.SetAsServer();
 
             GameStarted?.Invoke();
+            StateController.Instance.State = State.Paused;
         }
     }
     private async void DoHeartBeat()

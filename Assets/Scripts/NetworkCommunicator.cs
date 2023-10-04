@@ -114,8 +114,10 @@ public class NetworkCommunicator : NetworkBehaviour
         int clientID = (int)rpcParams.Receive.SenderClientId;
         if (acceptedRematch.Length > clientID)
             acceptedRematch[clientID] = true;
+
+        UIController.Instance.AddRPCInfo("Server Recieved Request request from: " + clientID);
     }
-    
+
     [ServerRpc(RequireOwnership = true)]
     public void SendWinConditionServerRpc(int winner)
     {

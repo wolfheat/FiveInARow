@@ -40,8 +40,11 @@ DEVLOG FOR - FIVE IN A ROW
 		* Clients requests placements that they self accept, server validates this placement and sends out action to all clients
 		* Clients report game finished, server validates this and sends out complete information to all clients
 		* Restart Game confirmation added
+		* Waiting for player
 
-		* Add Confirmation for restarting game and let server send this to all clients
+		* Returning to Lobby autostarts game (joincode is set) fix
+		* Fix restart games indefinetely now only works one time?
+		* Implement turnbased inputs to server, also show this on each player (Your turn, opponents turn)
 
 		* Determine when both players are connected (figure out why connections fail sometimes)
 		* Separate logic so only server makes decisions, clients send requests

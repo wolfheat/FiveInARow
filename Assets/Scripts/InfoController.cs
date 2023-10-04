@@ -27,7 +27,7 @@ public class InfoController : MonoBehaviour
     {
         Debug.Log("Request Rematch");
         UIController.Instance.AddRPCInfo("Request Rematch");
-
+        NetworkCommunicator.Instance.NotifyWantRematchServerRpc();
     }
 
     public void WaitingForPlayers(bool SetActive)

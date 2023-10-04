@@ -114,21 +114,6 @@ public class GameController : MonoBehaviour
         winLine.SetPositions(linePositions);
     }
     
-    public void HandleWin(string winner)
-    {        
-        // Win Line
-        winLine.gameObject.SetActive(true);
-        Vector3[] linePositions = tileMapController.TileMapLineIndexesAsWorldPositions();
-        winLine.SetPositions(linePositions);
-
-        // Info Panel
-        infoController.ShowPanel();
-        infoController.SetWinner(winner);
-
-        //State
-        StateController.Instance.State = State.Paused;
-
-    }
 
     public Vector2Int GetRandomPosition()
     {

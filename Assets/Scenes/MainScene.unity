@@ -8489,6 +8489,18 @@ PrefabInstance:
       propertyPath: m_text
       value: Lobby
       objectReference: {fileID: 0}
+    - target: {fileID: 3934713667079539712, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1763796797}
+    - target: {fileID: 3934713667079539712, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BackToLobby
+      objectReference: {fileID: 0}
+    - target: {fileID: 3934713667079539712, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIController, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 4066203925061171809, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
       propertyPath: m_Name
       value: BackToLobby
