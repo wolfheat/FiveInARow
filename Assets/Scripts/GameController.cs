@@ -10,6 +10,15 @@ public class GameController : MonoBehaviour
     [SerializeField] CameraController cameraController;
     [SerializeField] LineRendererController winLine;
 
+    public static GameController Instance { get; private set; }
+
+    private void Start()
+    {
+        if (Instance != null) Destroy(gameObject);
+        Instance = this;
+    }
+
+
     private void OnEnable()
     {
         Inputs.Controls.Main.Scroll.started += Scroll;
@@ -30,12 +39,7 @@ public class GameController : MonoBehaviour
     {
         Debug.Log("Game started");
         UIController.Instance.HideAllLobbies();
-        ResetGame();
-    }
-
-    private void Start()
-    {
-        // Dont start Game BY default
+        UIController.Instance.ShowWaitingForAllPlayers();
     }
 
     // Inputs
@@ -45,7 +49,7 @@ public class GameController : MonoBehaviour
         ResetGame();
     }
 
-    private void ResetGame()
+    public void ResetGame()
     {
         tileMapController.ResetGame();
         infoController.ShowPanel(false);
@@ -65,36 +69,51 @@ public class GameController : MonoBehaviour
             cameraController.ZoomIn();
     }
 
-    public void PlaceMarkerRandom(int playerIndex)
+    public bool PlaceMarkerByPlayerIndex(Vector2Int pos, int playerIndex)
     {
-        Vector3Int pos = new Vector3Int(Random.Range(0,10), Random.Range(0, 10),1);
-        Debug.Log("Place random marker at "+pos+" playerindex: "+playerIndex);
-        tileMapController.ChangeTileAtIndex(pos,playerIndex==0?Tiletype.X:Tiletype.O);
-    }
-    
-    public void PlaceMarkerByTiletype(Vector3Int pos, Tiletype tileType = Tiletype.X)
-    {
-
-        Debug.Log("Place marker at "+pos+" "+tileType);
-        tileMapController.ChangeTileAtIndex(pos,tileType);
-    }
-    public void PlaceMarkerByPlayerIndex(Vector3Int pos, int playerIndex)
-    {
-        Tiletype tileType = playerIndex == 0?Tiletype.X:Tiletype.O;
-        Debug.Log("Place marker at "+pos+" "+tileType);
-        tileMapController.ChangeTileAtIndex(pos,tileType);
+        bool gamecomple = tileMapController.ChangeTileAtIndex(pos,playerIndex);
+        if (gamecomple) ShowWinLine();
+        return gamecomple;
     }
     
     private void ClickedTile()
     {
         if (StateController.Instance.State != State.Playing) return;
 
-        Tiletype tiletype = Inputs.Controls.Main.Shift.IsPressed()?Tiletype.O:Tiletype.X;
-        tileMapController.RequestChangeTile(tiletype);
-            
+        // Client clicks handle this
+        Vector2Int posIndex = tileMapController.GetClickedIndex();
+        bool validSpot = tileMapController.IsPlacementValid(posIndex);
+
+        if (!validSpot)
+        {
+            Debug.Log("This is not a valid placement");
+            return;
+        }
+        // Client accepts this placement send it to server
+        NetworkCommunicator.Instance.SendPlacementServerRpc(posIndex);
     }
 
     // Actions
+    public void ShowWinner(int winner)
+    {
+        string winnerName = winner == 0 ? "X" : "O";
+
+        // Info Panel
+        infoController.ShowPanel();
+        infoController.SetWinner(winnerName);
+
+        //State
+        StateController.Instance.State = State.Paused;
+    }
+
+    public void ShowWinLine()
+    {        
+        // Win Line
+        winLine.gameObject.SetActive(true);
+        Vector3[] linePositions = tileMapController.TileMapLineIndexesAsWorldPositions();
+        winLine.SetPositions(linePositions);
+    }
+    
     public void HandleWin(string winner)
     {        
         // Win Line
@@ -111,11 +130,17 @@ public class GameController : MonoBehaviour
 
     }
 
-    public string GetRandomPositionString()
+    public Vector2Int GetRandomPosition()
     {
-        Vector3Int pos = new Vector3Int(Random.Range(0, 10), Random.Range(0, 10), 1);
-        string posAsString = ""+pos.x+pos.y;
-        Debug.Log("Vector3Int as string: "+posAsString);
-        return posAsString;
+        int sizeX = tileMapController.TileMap.size.x;
+        int sizeY = tileMapController.TileMap.size.y;
+        Vector2Int pos = new Vector2Int(Random.Range(2, sizeX-2), Random.Range(2, sizeY-2));
+        Debug.Log("Creating Random position: "+pos);
+        return pos;
+    }
+
+    public bool ValidatePlacement(Vector2Int pos, int playerID)
+    {
+        return tileMapController.IsPlacementValid(pos);
     }
 }

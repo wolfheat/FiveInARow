@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Unity.Netcode;
 using UnityEngine;
@@ -10,17 +9,71 @@ public class NetworkCommunicator : NetworkBehaviour
     public static NetworkCommunicator Instance;
     public static int PlayerIndex { set; get; }
 
+    private bool[] acceptedRematch = new bool[2];
+    private bool restartNotificationBeingDelivered;
+    private bool waitForPlayersToJoin = true;
+
     private void Start()
     {
         if (Instance == null) Destroy(Instance);
         Instance = this;
     }
 
+    private void Update()
+    {
+        // Only Server checks for rematch when state is paused
+        if (!IsServer) return;
+
+        // Wait for all players
+        if (waitForPlayersToJoin)
+        {
+            if (NetworkManager.ConnectedClients.Count >= 2)
+            {
+                Debug.Log("At least two players have joined");
+                waitForPlayersToJoin = false;
+                ResetRematchSize();
+
+                SendRematchConfirmationClientRpc();
+            }
+        }
+
+        if(StateController.Instance.State == State.Paused && !restartNotificationBeingDelivered)
+        {
+            if (AllPlayersWantRematch())
+            {
+                SendRematchConfirmationClientRpc();
+
+                // This variable keeps track so the server only sends out the restart once
+                restartNotificationBeingDelivered = true;
+            }
+        }
+    }
+
+    private void ResetMatchCounter()
+    {
+        ResetRematchSize();
+        restartNotificationBeingDelivered = false;
+    }
+
+    private bool AllPlayersWantRematch()
+    {
+        foreach (bool value in acceptedRematch) 
+        if(!value) return false;
+        return true;
+    }
+
     private void OnEnable()
     {
         Inputs.Controls.Main.L.performed += SetConnectedPlayersInfo;
-        Inputs.Controls.Main.M.performed += SendServerMessage;
-        Inputs.Controls.Main.N.performed += SendPlacement;
+        Inputs.Controls.Main.N.performed += SendRandomPlacement;
+    }
+
+    public void ResetRematchSize()
+    {
+        int size = NetworkManager.ConnectedClients.Count;
+        UIController.Instance.AddRPCInfo("Setting Rematch array to size: " + size);
+        Debug.Log("Setting Rematch size "+size);
+        acceptedRematch = new bool[size];
     }
 
     private void SetConnectedPlayersInfo(InputAction.CallbackContext callbackContext)
@@ -29,35 +82,72 @@ public class NetworkCommunicator : NetworkBehaviour
         UIController.Instance.SetConnectedPlayers(GetConnectedPlayers());
     }
     
-    private void SendPlacement(InputAction.CallbackContext callbackContext)
+    private void SendRandomPlacement(InputAction.CallbackContext callbackContext)
     {
-        ServerRpcParams parameters = new ServerRpcParams() {Receive = new ServerRpcReceiveParams() { } };
-        SendPlacementServerRpc(new Vector2Int(4,5));
+        if (StateController.Instance.State != State.Playing) return;
+
+        // Use this to send a random placement
+        Vector2Int randomplacement = GameController.Instance.GetRandomPosition();
+        SendPlacementServerRpc(randomplacement);
     }
     
-    private void SendServerMessage(InputAction.CallbackContext callbackContext)
-    {
-        // Check if this is a legal move then send it to all clients
-        if (!PlacementIsLegal()) return;
-
-        
-        string serverMessage = PlayerIndex.ToString();
-        Debug.Log("Send Message to Server ("+serverMessage+")");
-        UIController.Instance.AddRPCInfo("Sending my ID to Server: " + serverMessage);
-        SendMessageServerRpc(serverMessage);
-    }
-
-    private bool PlacementIsLegal()
-    {
-        return true;
-    }
-
     [ServerRpc(RequireOwnership = false)]
     public void SendPlacementServerRpc(Vector2Int pos, ServerRpcParams rpcParams = default)
     {
         Debug.Log("Server recieved request: " + pos + " from: "+rpcParams.Receive.SenderClientId);
-        UIController.Instance.AddRPCInfo("Recieved Position as Server: " + pos+" from: " + rpcParams.Receive.SenderClientId);
+        
+        bool placementAccepted = ServerGameController.Instance.HandlePlacementInput(pos,(int)rpcParams.Receive.SenderClientId);
+
+        if (!placementAccepted)
+        {
+            UIController.Instance.AddRPCInfo("Position placement, not accepted: " + pos+" from: " + rpcParams.Receive.SenderClientId);
+            return;
+        }
+
+        UIController.Instance.AddRPCInfo("Position placement, accepted: " + pos+" from: " + rpcParams.Receive.SenderClientId);
         SendPlacementClientRpc(new Vector3Int(pos.x,pos.y, (int)rpcParams.Receive.SenderClientId));
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void NotifyWantRematchServerRpc(ServerRpcParams rpcParams = default)
+    {
+        int clientID = (int)rpcParams.Receive.SenderClientId;
+        if (acceptedRematch.Length > clientID)
+            acceptedRematch[clientID] = true;
+    }
+    
+    [ServerRpc(RequireOwnership = true)]
+    public void SendWinConditionServerRpc(int winner)
+    {
+        Debug.Log("Server recieved winner from host: " + winner);
+    
+        UIController.Instance.AddRPCInfo("Server recieved winner: " + winner);
+
+        SendWinConditionClientRpc(winner);
+    }
+
+    [ClientRpc]
+    public void SendRematchConfirmationClientRpc()
+    {
+        Debug.Log("Client recieved rematch start notice: ");    
+        UIController.Instance.AddRPCInfo("Client recieved rematch start notice");
+        UIController.Instance.ShowWaitingForAllPlayers(false);
+        GameController.Instance.ResetGame();
+        if (IsServer)
+        {
+            UIController.Instance.AddRPCInfo("Server resets match counter");
+            ResetMatchCounter();
+        }
+    }
+
+
+    [ClientRpc]
+    public void SendWinConditionClientRpc(int winner)
+    {
+        Debug.Log("Client recieved winner: " + winner);
+    
+        UIController.Instance.AddRPCInfo("Client Recieved Winner: " + winner);
+        GameController.Instance.ShowWinner(winner);
     }
 
     [ClientRpc]
@@ -65,9 +155,14 @@ public class NetworkCommunicator : NetworkBehaviour
     {
         Debug.Log("Client recieved request: " + pos);
         UIController.Instance.AddRPCInfo("Recieved Position as Client: " + pos);
-        UIController.Instance.AddRPCInfo("Position Sent By: " + pos.z);
+        bool gameComplete = GameController.Instance.PlaceMarkerByPlayerIndex((Vector2Int)pos,pos.z);
+        // If client is server send out win notice
+        if(gameComplete)
+        {
+            SendWinConditionServerRpc(pos.z);
+        }
     }
-    
+    /*
     [ServerRpc(RequireOwnership = false)]
     public void SendMessageServerRpc(string message)
     {
@@ -87,7 +182,7 @@ public class NetworkCommunicator : NetworkBehaviour
         PlaceMarkerRequest(pos, playerIndex);
         string addition = IsHost ? (" Players: " + GetConnectedPlayers()) : "";
         UIController.Instance.AddRPCInfo("Recieved Message as Client: "+message + addition);
-    }
+    }*/
 
     private string GetConnectedPlayers()
     {
@@ -99,6 +194,11 @@ public class NetworkCommunicator : NetworkBehaviour
         }
         return sb.ToString();
     }
+    
+    public int GetConnectedPlayersAmount()
+    {
+        return NetworkManager.ConnectedClients.Count;
+    }
 
     private int Char2Int(char c)
     {
@@ -106,8 +206,4 @@ public class NetworkCommunicator : NetworkBehaviour
         return (int)char.GetNumericValue(playerIndexChar);
     }        
 
-    private void PlaceMarkerRequest(Vector3Int pos, int playerIndex)
-    {
-        FindObjectOfType<GameController>().PlaceMarkerByPlayerIndex(pos,playerIndex);
-    }
 }

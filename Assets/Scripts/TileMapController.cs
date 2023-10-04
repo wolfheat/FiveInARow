@@ -16,7 +16,7 @@ public class TileMapController : MonoBehaviour
 
     public Tilemap TileMap { get {return tilemap; }}
 
-    WinEvaluator winEvaluator = new WinEvaluator();
+    public WinEvaluator WinEvaluator { get; } = new WinEvaluator();
 
     //Constants
     public float CellSize = 0.32f;
@@ -44,29 +44,15 @@ public class TileMapController : MonoBehaviour
         CreateStartGrid();
         PositionChange?.Invoke();
     }
-
-    
-    // Actions
-    public void RequestChangeTile(Tiletype t)
+        
+    public Vector2Int GetClickedIndex()
     {
-        Tile changeToType = TileTypeToTile(t);
         // Get Mouse Position
-        //Vector2 mousePosition = Mouse.current.position.value;
         Vector2 mousePosition = Inputs.Controls.Touch.TouchPosition.ReadValue<Vector2>();
-
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePosition);
 
         // Get Clicked Index
-        Vector3Int tilePos = tilemap.WorldToCell(worldPos);
-        Vector3Int clickedIndex = new Vector3Int(tilePos.x, tilePos.y,1);
-
-        if (IndexIsOutOfBounds(clickedIndex))
-        {
-            //Debug.Log("Index OOB: "+ clickedIndex);
-            return;
-        }
-
-        ChangeTileAtIndex(clickedIndex, changeToType);
+        return (Vector2Int)tilemap.WorldToCell(worldPos);
 
     }
 
@@ -75,9 +61,24 @@ public class TileMapController : MonoBehaviour
         return t == Tiletype.X ? X : O;
     }
 
-    public void ChangeTileAtIndex(Vector3Int clickedIndex, Tiletype tileType)
+    public bool ChangeTileAtIndex(Vector2Int clickedIndex, int playerIndex)
     {
-        ChangeTileAtIndex(clickedIndex, TileTypeToTile(tileType));
+        // Change the tile
+        tilemap.SetTile(TileMapPosition(clickedIndex), tiles[playerIndex+1]);
+        
+        // Expand game area
+        ExpandTileMapIfNewMarkerIsToCloseToBorder(clickedIndex);
+
+        // Make each client determine the winline themself?
+        bool gameEnded = WinEvaluator.CheckGameComplete(tilemap, vacant);
+
+        // Check for game complete
+        return gameEnded;
+    }
+
+    private Vector3Int TileMapPosition(Vector2Int pos)
+    {
+        return new Vector3Int(pos.x, pos.y, 1);
     }
 
     public void ChangeTileAtIndex(Vector3Int clickedIndex, Tile changeToType)
@@ -92,23 +93,16 @@ public class TileMapController : MonoBehaviour
             return;
         }
 
-        // Change the tile if free
-        tilemap.SetTile(clickedIndex, changeToType);
-
-        // Expand game area
-        ExpandTileMapIfNewMarkerIsToCloseToBorder(clickedIndex);
-
-        // Check for game complete
-        if (winEvaluator.CheckGameComplete(tilemap, vacant))
-            gameController.HandleWin(winEvaluator.CountedTile.name);
+        
+        
     }
 
     public Vector3[] TileMapLineIndexesAsWorldPositions()
     {
-        return new Vector3[] { tilemap.CellToWorld((Vector3Int)winEvaluator.Line[0]) + centerOffsetVector, tilemap.CellToWorld((Vector3Int)winEvaluator.Line[1]) + centerOffsetVector };
+        return new Vector3[] { tilemap.CellToWorld((Vector3Int)WinEvaluator.Line[0]) + centerOffsetVector, tilemap.CellToWorld((Vector3Int)WinEvaluator.Line[1]) + centerOffsetVector };
     }
         
-    private void ExpandTileMapIfNewMarkerIsToCloseToBorder(Vector3Int clickedIndex)
+    private void ExpandTileMapIfNewMarkerIsToCloseToBorder(Vector2Int clickedIndex)
     {
         if(clickedIndex.x < ExpandSize)
         {
@@ -153,12 +147,17 @@ public class TileMapController : MonoBehaviour
         }
     }
 
+    private bool TileIsOccupied(Vector2Int pos)
+    {
+        return tilemap.GetTile(TileMapPosition(pos)) != vacant;
+    }
+    
     private bool TileIsOccupied(TileBase tile)
     {
         return tile != vacant;
     }
 
-    private bool IndexIsOutOfBounds(Vector3Int clickedIndex)
+    private bool IndexIsOutOfBounds(Vector2Int clickedIndex)
     {
         if(clickedIndex.x < 0 || clickedIndex.x >= tilemap.size.x)
             return true;
@@ -188,6 +187,11 @@ public class TileMapController : MonoBehaviour
         float width = tilemap.size.x * CellSize;
         float height = tilemap.size.y * CellSize;
         return new Vector3(width / 2, height / 2, Camera.main.transform.position.z);
+    }
+
+    public bool IsPlacementValid(Vector2Int posIndex)
+    {
+        return !IndexIsOutOfBounds(posIndex) && !TileIsOccupied(posIndex);
     }
 }
 

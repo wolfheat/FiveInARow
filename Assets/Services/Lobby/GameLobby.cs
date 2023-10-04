@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -82,6 +82,7 @@ public class GameLobby : MonoBehaviour
         // Check if game is set to start
         if (relayCode != "0")
         {
+            await Task.Delay(500);
             // Game has a relay code and this user is not Host (Host joins automatically)
             NetworkCommunicator.PlayerIndex = 0;
             if (!IsLobbyHost())
@@ -92,10 +93,6 @@ public class GameLobby : MonoBehaviour
             }
             else
                 UIController.Instance.SetAsServer();
-
-            //JoinedLobby = null;
-
-            // Leave Lobby? Keep Lobby?
 
             GameStarted?.Invoke();
         }

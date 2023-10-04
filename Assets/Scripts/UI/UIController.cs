@@ -12,6 +12,7 @@ public class UIController : MonoBehaviour
     private const int InfoLinesForRPC = 8;
     [SerializeField] GameLobbyUI gameLobbyUI;
     [SerializeField] LobbyUI lobbyUI;
+    [SerializeField] InfoController infoController;
     [SerializeField] GameLobby gameLobby;
     [SerializeField] MessagePopup generalMessagePopup;
     [SerializeField] TextMeshProUGUI serverClientText;
@@ -77,7 +78,6 @@ public class UIController : MonoBehaviour
 
     public void SetConnectedPlayers(string c)
     {
-
         connectedPlayers.text = c;
     }
     
@@ -109,5 +109,10 @@ public class UIController : MonoBehaviour
     Application.Quit();
 #endif
 
+    }
+
+    public void ShowWaitingForAllPlayers(bool show = true)
+    {
+        infoController.WaitingForPlayers(show);
     }
 }

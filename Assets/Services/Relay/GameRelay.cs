@@ -97,10 +97,6 @@ public class GameRelay : MonoBehaviour
         port = r.Port;
         allocationID = a;
         connectionData = c;
-
-        Debug.Log("Connection Data (my): " + c.AsString());
-        Debug.Log("Connection Data (Bitconverter): " + BitConverter.ToString(c));
-
         UIController.Instance.SetConnectionInfo("Host IP: [" + ip + "] - port:" + port+" Code: "+ JoinCode + "\nAllocation: " + allocationID+ "\n");
     }
     
@@ -119,9 +115,10 @@ public class GameRelay : MonoBehaviour
 
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-            NetworkManager.Singleton.StartClient();
+            bool didStart = NetworkManager.Singleton.StartClient();
+
             if(AuthenticationService.Instance.IsSignedIn)
-            SetConnectionDataB("Joined the Relay - signed in: ("+ AuthenticationService.Instance.IsSignedIn+")");
+            SetConnectionDataB("Joined the Relay - signed in: ("+ AuthenticationService.Instance.IsSignedIn+") clientStarted: "+didStart);
             SetConnectionData(joinAllocation.ServerEndpoints.First(conn => conn.ConnectionType == "dtls"), joinAllocation.AllocationId, joinAllocation.ConnectionData);
 
         }

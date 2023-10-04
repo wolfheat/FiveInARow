@@ -36,6 +36,12 @@ DEVLOG FOR - FIVE IN A ROW
 3/10	* Relay now sends position Vector and senderInfo
 		* Added log-window for troubleshooting
 		* Server/Client Header shown
+4/10	* Game logic implemented for server play
+		* Clients requests placements that they self accept, server validates this placement and sends out action to all clients
+		* Clients report game finished, server validates this and sends out complete information to all clients
+		* Restart Game confirmation added
+
+		* Add Confirmation for restarting game and let server send this to all clients
 
 		* Determine when both players are connected (figure out why connections fail sometimes)
 		* Separate logic so only server makes decisions, clients send requests
