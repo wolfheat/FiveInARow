@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Text;
 using Unity.Netcode;
 using UnityEngine;
@@ -24,6 +25,12 @@ public class NetworkCommunicator : NetworkBehaviour
         // Only Server checks for rematch when state is paused
         if (!IsServer) return;
 
+
+        if (AllPlayersWantRematch())
+        {
+            waitForPlayersToJoin = true;
+        }
+
         // Wait for all players
         if (waitForPlayersToJoin)
         {
@@ -32,21 +39,10 @@ public class NetworkCommunicator : NetworkBehaviour
                 Debug.Log("At least two players have joined");
                 waitForPlayersToJoin = false;
                 ResetRematchSize();
-
                 SendRematchConfirmationClientRpc();
             }
         }
-
-        if(StateController.Instance.State == State.Paused && !restartNotificationBeingDelivered)
-        {
-            if (AllPlayersWantRematch())
-            {
-                SendRematchConfirmationClientRpc();
-
-                // This variable keeps track so the server only sends out the restart once
-                restartNotificationBeingDelivered = true;
-            }
-        }
+                
     }
 
     private void ResetMatchCounter()
@@ -70,8 +66,8 @@ public class NetworkCommunicator : NetworkBehaviour
 
     public void ResetRematchSize()
     {
-        int size = NetworkManager.ConnectedClients.Count;
-        UIController.Instance.AddRPCInfo("Setting Rematch array to size: " + size);
+        int size = NetworkManager.ConnectedClients.Count;   
+        UIController.Instance.AddRPCInfo("Setting Rematch array to size: " + size+ " restartNotice=false");
         Debug.Log("Setting Rematch size "+size);
         acceptedRematch = new bool[size];
     }
@@ -157,12 +153,13 @@ public class NetworkCommunicator : NetworkBehaviour
     {
         Debug.Log("Client recieved request: " + pos);
         UIController.Instance.AddRPCInfo("Recieved Position as Client: " + pos);
+        
         bool gameComplete = GameController.Instance.PlaceMarkerByPlayerIndex((Vector2Int)pos,pos.z);
-        // If client is server send out win notice
-        if(gameComplete)
-        {
+        
+
+        // Only Host reports win?
+        if(gameComplete && IsServer)
             SendWinConditionServerRpc(pos.z);
-        }
     }
     /*
     [ServerRpc(RequireOwnership = false)]

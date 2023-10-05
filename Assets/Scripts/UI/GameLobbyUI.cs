@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameLobbyUI : MonoBehaviour
@@ -10,6 +11,7 @@ public class GameLobbyUI : MonoBehaviour
     [SerializeField] PlayerButton playerButtonPrefab;
     [SerializeField] GameObject playerButtonHolder;
     [SerializeField] GameObject startButton;
+    [SerializeField] GameObject joinButton;
     [SerializeField] GameLobby gameLobby;
     [SerializeField] TextMeshProUGUI lobbyCodeText;
     [SerializeField] TextMeshProUGUI lobbyNameText;
@@ -21,6 +23,16 @@ public class GameLobbyUI : MonoBehaviour
     private PlayerButton[] playerButtons;
     private const int AmountOfPlayers = 2;
 
+    public static GameLobbyUI Instance { get; private set; }
+
+    private void Start()
+    {
+        if (Instance != null) Destroy(gameObject);
+        Instance = this;
+    }
+
+    
+
     private void Init()
     {
         CreatePlayerButtons();
@@ -29,6 +41,7 @@ public class GameLobbyUI : MonoBehaviour
 
     private void OnEnable()
     {
+        HideStartJoinByDefault();
         GameLobby.Polling += UpdateLobby;
     }
     
@@ -92,10 +105,16 @@ public class GameLobbyUI : MonoBehaviour
 
     private void ShowStartButtonIfHostAndFull()
     {
-        if (JoinedLobbyIsFull() && IsLobbyHost())
+        if (JoinedLobbyIsFull() && gameLobby.IsHost)
             startButton.gameObject.SetActive(true);
         else 
             startButton.gameObject.SetActive(false);
+    }
+    
+    public void HideStartJoinByDefault()
+    {        
+        startButton.gameObject.SetActive(false);
+        joinButton.gameObject.SetActive(false);
     }
 
     private bool JoinedLobbyIsFull()
@@ -128,5 +147,21 @@ public class GameLobbyUI : MonoBehaviour
     {
         Debug.Log("Return to Lobby Pressed");
         gameLobby.LeaveLobbyAsync();
+    }
+
+    public void RequestJoinGame()
+    {
+        Debug.Log("Client request to join game");
+        gameLobby.JoinRelay();
+    }
+    public void ShowJoinButton(bool show = true)
+    {
+        joinButton.gameObject.SetActive(show);
+    }
+
+    public void SetToJoinbuttonState()
+    {
+        Debug.Log("Setting Lobby to join button state");
+
     }
 }

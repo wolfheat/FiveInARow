@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -11,6 +12,8 @@ public class GameLobby : MonoBehaviour
 {
     [SerializeField] bool UseUpdatePolling = true;
     public Lobby JoinedLobby { get; private set; }
+    public string RelayCode { get; private set; }
+
     public bool IsHost { get; private set; }
     private Lobby hostLobby;
     private float heartBeatTimer = 0;
@@ -26,6 +29,9 @@ public class GameLobby : MonoBehaviour
     private async void Start()
     {
         await UnityServices.InitializeAsync();
+
+        // Check if signed in?
+        //if (AuthenticationService.Instance.SessionTokenExists) return;
 
 
         AuthenticationService.Instance.SignedIn += () =>
@@ -77,27 +83,50 @@ public class GameLobby : MonoBehaviour
         JoinedLobby = lobby;
         Polling?.Invoke(lobby);
 
-        string relayCode = JoinedLobby.Data[RELAY_CODE].Value;
+        RelayCode = JoinedLobby.Data[RELAY_CODE].Value;
 
         // Check if game is set to start
-        if (relayCode != "0")
+        if (RelayCode != "0")
         {
-            await Task.Delay(500);
-            // Game has a relay code and this user is not Host (Host joins automatically)
-            NetworkCommunicator.PlayerIndex = 0;
-            if (!IsLobbyHost())
+            Debug.Log("Relay code is set: "+RelayCode+" this is host: "+IsHost);
+            if (!IsHost)
             {
-                GameRelay.Instance.JoinRelayAsync(relayCode);
-                UIController.Instance.SetAsServer(false);
-                NetworkCommunicator.PlayerIndex = 1;
+                ShowJoinButton();
             }
             else
-                UIController.Instance.SetAsServer();
-
-            GameStarted?.Invoke();
-            StateController.Instance.State = State.Paused;
+            {
+                JoinSetup(true);
+            }
         }
+        else
+            ShowJoinButton(false);
     }
+
+    private void JoinSetup(bool isHost)
+    {
+        // Host Joins directly when joincode is set
+        UIController.Instance.SetInGameTextAsServer(isHost);
+        GameStarted?.Invoke();
+        StateController.Instance.State = State.Paused;// Game has a relay code and this user is not Host (Host joins automatically)
+        NetworkCommunicator.PlayerIndex = isHost?0:1;
+    }
+
+    public void JoinRelay()
+    {
+        if (RelayCode == "")
+        {
+            Debug.Log("Trying to join relay but it has no valid joincode");
+            return;
+        }
+        JoinSetup(false);
+        GameRelay.Instance.JoinRelayAsync(RelayCode);
+    }
+    
+    private void ShowJoinButton(bool show = true)
+    {
+        GameLobbyUI.Instance.ShowJoinButton(show);
+    }
+
     private async void DoHeartBeat()
     {
         Debug.Log("Doing Heart beat");
@@ -224,7 +253,8 @@ public class GameLobby : MonoBehaviour
             Debug.Log("Created Lobby "+lobbyName+", with max players: "+maxPlayers+" LobbyCode: "+ lobby.LobbyCode);
             // Auto Join This Game If you are the creator
             hostLobby = lobby;
-            JoinedLobby = lobby;
+            JoinedLobby = lobby; 
+            IsHost = true;
             UIController.Instance.JoinGameLobby(JoinedLobby);
         }
         catch (LobbyServiceException e)

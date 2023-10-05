@@ -17,6 +17,7 @@ public class UIController : MonoBehaviour
     [SerializeField] MessagePopup generalMessagePopup;
     [SerializeField] TextMeshProUGUI serverClientText;
     [SerializeField] TextMeshProUGUI recieveData;
+    [SerializeField] TextMeshProUGUI recieveDataB;
     [SerializeField] TextMeshProUGUI connectedPlayers;
     [SerializeField] Image serverClientImage;
     [SerializeField] TextMeshProUGUI connectionInfo;
@@ -44,6 +45,7 @@ public class UIController : MonoBehaviour
         StateController.Instance.State = State.Lobby;
         lobbyUI.gameObject.SetActive(false);
         gameLobbyUI.gameObject.SetActive(true);
+        gameLobbyUI.SetToJoinbuttonState();
     }
 
     public void ShowMainLobby()
@@ -79,6 +81,11 @@ public class UIController : MonoBehaviour
         recieveInfoArray.Enqueue(newInfo);
         SetRecieveDataFromArray();
     }
+    
+    public void AddRPCInfoB(string info)
+    {
+        recieveDataB.text = info;
+    }
 
     public void SetConnectedPlayers(string c)
     {
@@ -95,7 +102,7 @@ public class UIController : MonoBehaviour
         recieveData.text = finalRecieveDataString.ToString();
     }
 
-    public void SetAsServer(bool isServer = true)
+    public void SetInGameTextAsServer(bool isServer = true)
     {
         serverClientImage.color = isServer?Color.red:Color.blue;
         serverClientText.text = isServer ? "Server" : "Client";
@@ -105,6 +112,9 @@ public class UIController : MonoBehaviour
     {
         Debug.Log("Requesting Back to lobby");
         // Disconnect from server and show lobby
+
+        //GameRelay.Instance.Disconnect();
+
         ShowJoinedLobby();
     }
     public void ShowPopup(string message)
