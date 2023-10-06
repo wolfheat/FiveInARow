@@ -45,7 +45,9 @@ DEVLOG FOR - FIVE IN A ROW
 		* Made Start and Join button not visible when entering lobby screen
 6/10	* Implemented turnbased gameplay. Your Turn notice show for players
 		* Random starting player for each game
-		
+		* Player Names And Score are now stored
+
+
 		* Make every other starting instead of random? Loser starts?
 		* Add score for the session?
 

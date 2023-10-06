@@ -9,14 +9,16 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
-    private const int InfoLinesForRPC = 8;
+    private const int InfoLinesForRPC = 20;
     [SerializeField] GameLobbyUI gameLobbyUI;
     [SerializeField] GameObject myTurnIndicator;
+    [SerializeField] GameObject lobbies;
     [SerializeField] LobbyUI lobbyUI;
     [SerializeField] InfoController infoController;
     [SerializeField] WaitingInfoController waitingInfoController;   
     [SerializeField] GameLobby gameLobby;
     [SerializeField] MessagePopup generalMessagePopup;
+    [SerializeField] TextMeshProUGUI score;
     [SerializeField] TextMeshProUGUI serverClientText;
     [SerializeField] TextMeshProUGUI recieveData;
     [SerializeField] TextMeshProUGUI recieveDataB;
@@ -42,6 +44,7 @@ public class UIController : MonoBehaviour
     private void InitializeCorrectMenus()
     {
         lobbyUI.gameObject.SetActive(true);
+        lobbies.gameObject.SetActive(true);
         infoController.gameObject.SetActive(true);
         gameLobbyUI.gameObject.SetActive(false);
         waitingInfoController.gameObject.SetActive(false);
@@ -115,6 +118,13 @@ public class UIController : MonoBehaviour
         recieveData.text = finalRecieveDataString.ToString();
     }
 
+    public void UpdateScoreText(int[] s, string[] playerNames)
+    {
+        SetConnectionInfoB("Updating Score Text: ");
+        score.text = playerNames[0] + " " + s[0] +" - " + s[1] +" " +playerNames[1];
+        SetConnectionInfoB("Updating Score Text to: "+score.text);
+    }
+    
     public void SetInGameTextAsServer(bool isServer = true)
     {
         serverClientImage.color = isServer?Color.red:Color.blue;

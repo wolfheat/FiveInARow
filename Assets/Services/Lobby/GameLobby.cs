@@ -261,7 +261,6 @@ public class GameLobby : MonoBehaviour
         }
     }
 
-
     public async void LeaveLobbyAsync()
     {
         try

@@ -125,6 +125,11 @@ public class GameController : MonoBehaviour
     }
     
 
+    public Vector3Int GetAnOccupiedPosition()
+    {
+        return tileMapController.GetOneOccupiedTilePosition();
+    }
+    
     public Vector2Int GetRandomPosition()
     {
         int sizeX = tileMapController.TileMap.size.x;

@@ -68,7 +68,7 @@ public class GameRelay : MonoBehaviour
             UIController.Instance.SetConnectionInfo("Created allocation ["+ JoinCode + "] ID:"+allocation.AllocationId.ToString());            
             SetConnectionData(allocation.ServerEndpoints.First(conn => conn.ConnectionType == ConnectionType.udp),allocation.AllocationId, allocation.ConnectionData);            
             SetConnectionDataB("Created the Relay");
-
+            NetworkCommunicator.Instance.UpdatePlayerNamesFromLobby();
             return JoinCode;
         }
         catch(RelayServiceException e)
@@ -107,6 +107,9 @@ public class GameRelay : MonoBehaviour
 
             SetConnectionDataB("Joined the Relay - signed in: ("+ AuthenticationService.Instance.IsSignedIn+") clientStarted: "+didStart);
             SetConnectionData(joinAllocation.ServerEndpoints.First(conn => conn.ConnectionType == ConnectionType.udp), joinAllocation.AllocationId, joinAllocation.ConnectionData);
+            NetworkCommunicator.Instance.ResetScore();
+            NetworkCommunicator.Instance.UpdatePlayerNamesFromLobby();
+            // Set playernames from Lobby?
 
         }
         catch (RelayServiceException e)

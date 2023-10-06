@@ -8,6 +8,11 @@ public class InfoController : MonoBehaviour
     [SerializeField] GameObject waitingForPlayersObject;
     [SerializeField] TextMeshProUGUI winnertext;
 
+    private void Start()
+    {
+        ShowPanel(false);
+    }
+
     public void ShowPanel(bool show=true)
     {
         panel.SetActive(show);
