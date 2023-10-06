@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,6 +9,9 @@ public class NetworkCommunicator : NetworkBehaviour
 
     public static NetworkCommunicator Instance;
     public static int PlayerIndex { set; get; }
+    public static bool IsMyTurn { get; private set; }
+
+
 
     private bool[] acceptedRematch = new bool[2];
     private bool restartNotificationBeingDelivered;
@@ -38,7 +42,10 @@ public class NetworkCommunicator : NetworkBehaviour
                 Debug.Log("At least two players have joined");
                 waitForPlayersToJoin = false;
                 ResetRematchSize();
-                SendRematchConfirmationClientRpc();
+
+                // Use random starter
+                int randomstarter = Random.Range(0, NetworkManager.ConnectedClients.Count);
+                SendRematchConfirmationClientRpc(randomstarter);
             }
         }
                 
@@ -80,9 +87,18 @@ public class NetworkCommunicator : NetworkBehaviour
     private void SendRandomPlacement(InputAction.CallbackContext callbackContext)
     {
         if (StateController.Instance.State != State.Playing) return;
-
-        // Use this to send a random placement
+        if (!IsMyTurn)
+        {
+            Debug.Log("Not Your turn");
+            return;
+        }
         Vector2Int randomplacement = GameController.Instance.GetRandomPosition();
+
+        UIController.Instance.AddRPCInfo("Sending Position for validation: " + randomplacement);
+        // Show Info SetWaitingInfoController
+        UIController.Instance.ShowPopupInfoControllerMessage("Sending " + randomplacement + " placement for validation");
+        // Use this to send a random placement
+
         SendPlacementServerRpc(randomplacement);
     }
     
@@ -96,6 +112,13 @@ public class NetworkCommunicator : NetworkBehaviour
         if (!placementAccepted)
         {
             UIController.Instance.AddRPCInfo("Position placement, not accepted: " + pos+" from: " + rpcParams.Receive.SenderClientId);
+            ClientRpcParams clientRpcParams = new ClientRpcParams { 
+                Send = new ClientRpcSendParams { 
+                    TargetClientIds = new List<ulong>{ rpcParams.Receive.SenderClientId }
+                } 
+            };
+
+            SendPlacementRejectionClientRpc(clientRpcParams);
             return;
         }
 
@@ -124,7 +147,7 @@ public class NetworkCommunicator : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SendRematchConfirmationClientRpc()
+    public void SendRematchConfirmationClientRpc(int starter)
     {
         Debug.Log("Client recieved rematch start notice: ");    
         UIController.Instance.AddRPCInfo("Client recieved rematch start notice");
@@ -135,6 +158,7 @@ public class NetworkCommunicator : NetworkBehaviour
             UIController.Instance.AddRPCInfo("Server resets match counter");
             ResetMatchCounter();
         }
+        HandleRecievedGameStarter(starter);
     }
 
 
@@ -154,33 +178,90 @@ public class NetworkCommunicator : NetworkBehaviour
         UIController.Instance.AddRPCInfo("Recieved Position as Client: " + pos);
         
         bool gameComplete = GameController.Instance.PlaceMarkerByPlayerIndex((Vector2Int)pos,pos.z);
-        
 
+        HandleRecievedValidPlacement(pos.z);
+        
         // Only Host reports win?
-        if(gameComplete && IsServer)
+        if (gameComplete && IsServer)
             SendWinConditionServerRpc(pos.z);
-    }
-    /*
-    [ServerRpc(RequireOwnership = false)]
-    public void SendMessageServerRpc(string message)
-    {
-        Debug.Log("Server recieved request: " + message);
-        string randomPositionString = FindObjectOfType<GameController>().GetRandomPositionString();
-        string newMessage = message + randomPositionString;
-        UIController.Instance.AddRPCInfo("Recieved Message as Server: " + newMessage + " Players: " + GetConnectedPlayers());
-        SendMessageClientRpc(newMessage);
     }
 
     [ClientRpc]
-    public void SendMessageClientRpc(string message)
+    public void SendPlacementRejectionClientRpc(ClientRpcParams clientRecieveParams)
     {
-        Debug.Log("Clients recieved message from server: " + message);
-        int playerIndex = Char2Int(message[0]);
-        Vector3Int pos = new Vector3Int(Char2Int(message[1]), Char2Int(message[2]),1);
-        PlaceMarkerRequest(pos, playerIndex);
-        string addition = IsHost ? (" Players: " + GetConnectedPlayers()) : "";
-        UIController.Instance.AddRPCInfo("Recieved Message as Client: "+message + addition);
-    }*/
+        int rejectedID = (int)clientRecieveParams.Send.TargetClientIds[0];
+        Debug.Log("Client recieved rejection for clientID: " + rejectedID);
+
+        UIController.Instance.AddRPCInfo("Recieved Position Rejection: " + rejectedID);
+                
+        HandleRecievedInvalidPlacement();
+    }
+
+    [ClientRpc]
+    public void SendStarterClientRpc(int starter)
+    {
+        Debug.Log("Client recieved starter: " + starter);
+        UIController.Instance.AddRPCInfo("Client recieved starter: " + starter);
+        
+        HandleRecievedGameStarter(starter);
+    }
+
+    private void HandleRecievedInvalidPlacement()
+    {
+        // Input rejected
+        UIController.Instance.HidePopupInfoControllerMessage();
+    }
+
+    private void HandleRecievedValidPlacement(int senderID)
+    {
+        // Its the player that did not place last markers turn
+        int playerTurn = senderID == 0 ? 1 : 0;
+
+        // Recieving a placement that I sent to the server
+        SetMyTurn(PlayerIndex == playerTurn?true:false);
+        
+        UIController.Instance.HidePopupInfoControllerMessage();
+
+        // Show Info SetWaitingInfoController
+        UIController.Instance.AddRPCInfo(playerTurn + " Turn. Now its my turn: " + (PlayerIndex == playerTurn));
+
+    }
+    
+    private void HandleRecievedGameStarter(int starter)
+    {
+        SetMyTurn(PlayerIndex == starter?true:false);
+        
+        // Show Info SetWaitingInfoController
+        UIController.Instance.AddRPCInfo(PlayerIndex==starter?"You go first!":"Opponent goes first!");
+    }
+
+    private void SetMyTurn(bool myTurn)
+    {
+        IsMyTurn = myTurn;
+        UIController.Instance.MyTurnIndicator(IsMyTurn);
+    }
+
+    /*
+[ServerRpc(RequireOwnership = false)]
+public void SendMessageServerRpc(string message)
+{
+   Debug.Log("Server recieved request: " + message);
+   string randomPositionString = FindObjectOfType<GameController>().GetRandomPositionString();
+   string newMessage = message + randomPositionString;
+   UIController.Instance.AddRPCInfo("Recieved Message as Server: " + newMessage + " Players: " + GetConnectedPlayers());
+   SendMessageClientRpc(newMessage);
+}
+
+[ClientRpc]
+public void SendMessageClientRpc(string message)
+{
+   Debug.Log("Clients recieved message from server: " + message);
+   int playerIndex = Char2Int(message[0]);
+   Vector3Int pos = new Vector3Int(Char2Int(message[1]), Char2Int(message[2]),1);
+   PlaceMarkerRequest(pos, playerIndex);
+   string addition = IsHost ? (" Players: " + GetConnectedPlayers()) : "";
+   UIController.Instance.AddRPCInfo("Recieved Message as Client: "+message + addition);
+}*/
 
     private string GetConnectedPlayers()
     {

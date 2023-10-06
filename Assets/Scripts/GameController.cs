@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -79,6 +78,11 @@ public class GameController : MonoBehaviour
     private void ClickedTile()
     {
         if (StateController.Instance.State != State.Playing) return;
+        if (!NetworkCommunicator.IsMyTurn)
+        {
+            Debug.Log("Not Your turn");
+            return;
+        }
 
         // Client clicks handle this
         Vector2Int posIndex = tileMapController.GetClickedIndex();
@@ -89,8 +93,14 @@ public class GameController : MonoBehaviour
             Debug.Log("This is not a valid placement");
             return;
         }
+        
+        // Show Info SetWaitingInfoController
+        UIController.Instance.ShowPopupInfoControllerMessage("Sending "+posIndex+" placement for validation");
+
+        UIController.Instance.AddRPCInfo("Sending Position for validation: " + posIndex);
         // Client accepts this placement send it to server
         NetworkCommunicator.Instance.SendPlacementServerRpc(posIndex);
+
     }
 
     // Actions

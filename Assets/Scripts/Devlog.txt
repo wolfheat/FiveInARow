@@ -43,25 +43,27 @@ DEVLOG FOR - FIVE IN A ROW
 		* Waiting for player Notice added
 5/10	* Fixed restart issue, players can now restart indefinitely
 		* Made Start and Join button not visible when entering lobby screen
+6/10	* Implemented turnbased gameplay. Your Turn notice show for players
+		* Random starting player for each game
+		
+		* Make every other starting instead of random? Loser starts?
+		* Add score for the session?
 
+		* (RE)Joining a started game should get the entire game state.
+
+		// SERVER ISSUSES
 		Still issue with returning to lobby not working, need to restart game to work
 		* Request Lobby button after game wont take you to lobby?
 		* Returning to Lobby How to exit relay session when leaving?
 		* Do Exiting a relay need to send data to relay to exit correctly?
 		* How do I make it possible to enter relay again after leaving?
 
-		* (RE)Joining a started game should get the entire game state.
-
-		* Fix restart games indefinetely now only works one time?
-		* Implement turnbased inputs to server, also show this on each player (Your turn, opponents turn)
-
 		* Determine when both players are connected (figure out why connections fail sometimes)
-		* Separate logic so only server makes decisions, clients send requests
-
-
-		* Make Game playable as multiplayer
+		
 		* Set to android mode
-		* Have specific queries for games? Playeramount, spectators = overkill?
+		* Have specific queries for games? Playeramount.
+		* Have three player support?
+		* Add spectators support?
 
 		TODO
 		* Make Main lobby only show games with free spots

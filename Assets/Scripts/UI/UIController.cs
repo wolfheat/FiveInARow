@@ -11,8 +11,10 @@ public class UIController : MonoBehaviour
 {
     private const int InfoLinesForRPC = 8;
     [SerializeField] GameLobbyUI gameLobbyUI;
+    [SerializeField] GameObject myTurnIndicator;
     [SerializeField] LobbyUI lobbyUI;
     [SerializeField] InfoController infoController;
+    [SerializeField] WaitingInfoController waitingInfoController;   
     [SerializeField] GameLobby gameLobby;
     [SerializeField] MessagePopup generalMessagePopup;
     [SerializeField] TextMeshProUGUI serverClientText;
@@ -32,6 +34,17 @@ public class UIController : MonoBehaviour
             Destroy(Instance.gameObject);
         }
         Instance = this;
+
+        InitializeCorrectMenus();
+
+    }
+
+    private void InitializeCorrectMenus()
+    {
+        lobbyUI.gameObject.SetActive(true);
+        infoController.gameObject.SetActive(true);
+        gameLobbyUI.gameObject.SetActive(false);
+        waitingInfoController.gameObject.SetActive(false);
     }
 
     public void JoinGameLobby(Lobby lobby)
@@ -131,9 +144,27 @@ public class UIController : MonoBehaviour
 
     }
 
+    public void HidePopupInfoControllerMessage()
+    {
+        Debug.Log("Hide waiting info");
+        waitingInfoController.gameObject.SetActive(false);
+    }
+
+    public void ShowPopupInfoControllerMessage(string info)
+    {
+        Debug.Log("Show waiting info: "+info);
+        waitingInfoController.gameObject.SetActive(true);
+        waitingInfoController.SetInfoText(info);
+    }
+
     public void ShowWaitingForAllPlayers(bool show = true)
     {
         StateController.Instance.State = State.Paused;
         infoController.WaitingForPlayers(show);
+    }
+
+    internal void MyTurnIndicator(bool setActive)
+    {
+        myTurnIndicator.SetActive(setActive);
     }
 }
