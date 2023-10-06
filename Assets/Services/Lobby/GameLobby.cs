@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -15,13 +13,16 @@ public class GameLobby : MonoBehaviour
     public string RelayCode { get; private set; }
 
     public bool IsHost { get; private set; }
+
     private Lobby hostLobby;
-    private float heartBeatTimer = 0;
-    private float pollingTimer = 0;
+
+    private const string RELAY_CODE = "RELAY_CODE";
     private const float HeartBeatTime = 15f;
     private const float PollingTime = 1.5f;
     private string playerName = "RandomName";
-    private string RELAY_CODE = "RELAY_CODE";
+    private float heartBeatTimer = 0;
+    private float pollingTimer = 0;
+
     public static Action<Lobby> Polling;
     public static Action GameStarted;
     public static Action<List<Lobby>> PollingGameList;
@@ -31,8 +32,6 @@ public class GameLobby : MonoBehaviour
         await UnityServices.InitializeAsync();
 
         // Check if signed in?
-        //if (AuthenticationService.Instance.SessionTokenExists) return;
-
 
         AuthenticationService.Instance.SignedIn += () =>
         {
@@ -45,8 +44,11 @@ public class GameLobby : MonoBehaviour
 
     private void Update()
     {
+        // Heart beat - helps the host keep the gamelobby from timing out
         HandleHeartbeat();
-        HandleUpdatePolling();
+
+        // Polling - updates information for each player about the joined lobby OR available lobbies
+        HandlePolling();
     }
 
     private void HandleHeartbeat()
@@ -59,29 +61,30 @@ public class GameLobby : MonoBehaviour
             heartBeatTimer -= HeartBeatTime;
         }
     }
-    private void HandleUpdatePolling()
+
+    private void HandlePolling()
     {
         if (!UseUpdatePolling || StateController.Instance.State != State.Lobby) return;
-
         pollingTimer += Time.deltaTime;
-        //Debug.Log("Polling timer: "+pollingTimer);
         if(pollingTimer >= PollingTime)
         {
             pollingTimer -= PollingTime;
+            // Player has joined a gamelobby
             if(JoinedLobby != null)
             {
-                DoUpdatePolling();
+                JoinedLobbyPolling();
                 return;
             }
+            // Player is in Main Lobby
             UpdateLobbiesListAsync();
         }
     }
 
-    private async void DoUpdatePolling()
+    private async void JoinedLobbyPolling()
     {
-        Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
-        JoinedLobby = lobby;
-        Polling?.Invoke(lobby);
+        JoinedLobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
+        
+        Polling?.Invoke(JoinedLobby);
 
         RelayCode = JoinedLobby.Data[RELAY_CODE].Value;
 
@@ -90,16 +93,12 @@ public class GameLobby : MonoBehaviour
         {
             Debug.Log("Relay code is set: "+RelayCode+" this is host: "+IsHost);
             if (!IsHost)
-            {
                 ShowJoinButton();
-            }
             else
-            {
                 JoinSetup(true);
-            }
         }
         else
-            ShowJoinButton(false);
+            ShowJoinButton(false); // Currently this is set all the time (inefficient)
     }
 
     private void JoinSetup(bool isHost)
@@ -107,12 +106,13 @@ public class GameLobby : MonoBehaviour
         // Host Joins directly when joincode is set
         UIController.Instance.SetInGameTextAsServer(isHost);
         GameStarted?.Invoke();
-        StateController.Instance.State = State.Paused;// Game has a relay code and this user is not Host (Host joins automatically)
+        StateController.Instance.State = State.Paused;
         NetworkCommunicator.PlayerIndex = isHost?0:1;
     }
 
     public void JoinRelay()
     {
+        // Only Clients Join by JoinCode
         if (RelayCode == "")
         {
             Debug.Log("Trying to join relay but it has no valid joincode");
@@ -147,16 +147,13 @@ public class GameLobby : MonoBehaviour
         }
     }
 
+    // JOINING
     public async void QuickJoinLobby()
     {
         try
         {
-            QuickJoinLobbyOptions quickJoinLobbyOptions = new QuickJoinLobbyOptions{
-                Player = GetPlayer()
-            };
-
-            Lobby lobby = await LobbyService.Instance.QuickJoinLobbyAsync(quickJoinLobbyOptions);
-            JoinedLobby = lobby;
+            QuickJoinLobbyOptions quickJoinLobbyOptions = new QuickJoinLobbyOptions{Player = GetPlayer()};
+            JoinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync(quickJoinLobbyOptions);
             UIController.Instance.JoinGameLobby(JoinedLobby);
         }
         catch (LobbyServiceException e)
@@ -167,48 +164,22 @@ public class GameLobby : MonoBehaviour
         }
     }
 
-    public async void JoinLobbyByLobbyIdAsync(string id)
-    {
-        try
-        {
-            JoinLobbyByIdOptions joinLobbyByIdOptions = new JoinLobbyByIdOptions
-            {
-                Player = GetPlayer()
-            };
-
-            Lobby lobby = await LobbyService.Instance.JoinLobbyByIdAsync(id, joinLobbyByIdOptions);
-            JoinedLobby = lobby;
-            UIController.Instance.JoinGameLobby(JoinedLobby);
-        }
-        catch (LobbyServiceException e)
-        {
-            //if(e.Message.)
-            UIController.Instance.ShowPopup("Invalid Code!");
-            Debug.Log(e);
-        }
-
-    }
     public async void JoinLobbyByLobbyCodeAsync(string lobbyCode)
     {
         try
         {
-            JoinLobbyByCodeOptions joinLobbyByCodeOptions = new JoinLobbyByCodeOptions
-            {
-                Player = GetPlayer()
-            };
-
-            Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, joinLobbyByCodeOptions);
-            JoinedLobby = lobby;
+            JoinLobbyByCodeOptions joinLobbyByCodeOptions = new JoinLobbyByCodeOptions{Player = GetPlayer()};
+            JoinedLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(lobbyCode, joinLobbyByCodeOptions);
             UIController.Instance.JoinGameLobby(JoinedLobby);
         }
         catch (LobbyServiceException e)
         {
-            //if(e.Message.)
             UIController.Instance.ShowPopup("Invalid Code!");
             Debug.Log(e);
         }
     }
 
+    // CREATING
     public async void CreatePrivateLobbyAsync()
     {
         try

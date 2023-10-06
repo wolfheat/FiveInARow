@@ -11,24 +11,20 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 
-
-
 public class GameRelay : MonoBehaviour
 {
+    public class ConnectionType{public static string dtls = "dtls";public static string udp = "udp";}
+
     public static GameRelay Instance;
     public static Allocation JoinedRelay { get; set; }
+    private string JoinCode { get; set;}
 
     private float updateTimer = 0;
     private float UpdateTime = 1.0f;
-    private string JoinCode { get; set;}
-
-    public class ConnectionType{public static string dtls = "dtls";public static string udp = "udp";}
-
     private string ip;
     private int port;
     private byte[] connectionData;
-    private System.Guid allocationID;
-
+    private Guid allocationID;
 
     private async void Start()
     {
@@ -38,9 +34,10 @@ public class GameRelay : MonoBehaviour
         // Check if signed in?
         //if (AuthenticationService.Instance.SessionTokenExists) return;
 
+        // Initialize the connection to the Authentication Service + Sign In
         try {
 
-                await UnityServices.InitializeAsync();
+            await UnityServices.InitializeAsync();
 
             AuthenticationService.Instance.SignedIn += () =>
             {
@@ -52,22 +49,6 @@ public class GameRelay : MonoBehaviour
         catch (Exception e) 
         { 
             Debug.Log(e);
-        }
-
-
-    }
-
-    private void Update()
-    {
-        if (JoinedRelay != null)
-        {
-            updateTimer-= Time.deltaTime;
-            if(updateTimer <= 0)
-            {
-                updateTimer += UpdateTime;
-                // Update Here
-            }
-
         }
     }
 
@@ -83,10 +64,9 @@ public class GameRelay : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartHost();
 
-            UIController.Instance.SetConnectionInfo("Created allocation ["+ JoinCode + "] ID:"+allocation.AllocationId.ToString());
-            
-            SetConnectionData(allocation.ServerEndpoints.First(conn => conn.ConnectionType == ConnectionType.udp),allocation.AllocationId, allocation.ConnectionData);
-            
+            // Show values in debug window
+            UIController.Instance.SetConnectionInfo("Created allocation ["+ JoinCode + "] ID:"+allocation.AllocationId.ToString());            
+            SetConnectionData(allocation.ServerEndpoints.First(conn => conn.ConnectionType == ConnectionType.udp),allocation.AllocationId, allocation.ConnectionData);            
             SetConnectionDataB("Created the Relay");
 
             return JoinCode;
@@ -125,7 +105,6 @@ public class GameRelay : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             bool didStart = NetworkManager.Singleton.StartClient();
 
-            if(AuthenticationService.Instance.IsSignedIn)
             SetConnectionDataB("Joined the Relay - signed in: ("+ AuthenticationService.Instance.IsSignedIn+") clientStarted: "+didStart);
             SetConnectionData(joinAllocation.ServerEndpoints.First(conn => conn.ConnectionType == ConnectionType.udp), joinAllocation.AllocationId, joinAllocation.ConnectionData);
 
@@ -137,6 +116,7 @@ public class GameRelay : MonoBehaviour
         }
     }
 
+    // Disconnect method - Not implemented yet
     public void Disconnect(ulong clientId)
     {
         Debug.Log("Trying to disconnect Client");

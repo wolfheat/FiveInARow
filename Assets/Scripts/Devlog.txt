@@ -44,14 +44,13 @@ DEVLOG FOR - FIVE IN A ROW
 5/10	* Fixed restart issue, players can now restart indefinitely
 		* Made Start and Join button not visible when entering lobby screen
 
-
+		Still issue with returning to lobby not working, need to restart game to work
 		* Request Lobby button after game wont take you to lobby?
-		* Returning to Lobby autostarts game (joincode is set) fix
-
+		* Returning to Lobby How to exit relay session when leaving?
 		* Do Exiting a relay need to send data to relay to exit correctly?
 		* How do I make it possible to enter relay again after leaving?
 
-		* (RE)Joining a started game should update game state.
+		* (RE)Joining a started game should get the entire game state.
 
 		* Fix restart games indefinetely now only works one time?
 		* Implement turnbased inputs to server, also show this on each player (Your turn, opponents turn)

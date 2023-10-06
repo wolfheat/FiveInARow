@@ -61,10 +61,6 @@ public class LobbyUI : MonoBehaviour
         joinPrivateGameController.Reset();
     }
 
-    public void JoinGameById(string id)
-    {
-        gameLobby.JoinLobbyByLobbyIdAsync(id);
-    }
     public void JoinGame(string LobbyCode)
     {
         Debug.Log("Request Join Game: "+ LobbyCode);
