@@ -14,26 +14,23 @@ using UnityEngine;
 public class GameRelay : MonoBehaviour
 {
     public class ConnectionType{public static string dtls = "dtls";public static string udp = "udp";}
+    public struct ConnectionData{ public static string ip; public static int port; public static Guid allocationID;public static byte[] connectionData; }
 
     public static GameRelay Instance;
     public static Allocation JoinedRelay { get; set; }
     private string JoinCode { get; set;}
 
-    private float updateTimer = 0;
-    private float UpdateTime = 1.0f;
-    private string ip;
-    private int port;
-    private byte[] connectionData;
-    private Guid allocationID;
 
-    private async void Start()
+    private void Start()
     {
         if (Instance != null) Destroy(gameObject);
         Instance = this;
 
-        // Check if signed in?
-        //if (AuthenticationService.Instance.SessionTokenExists) return;
+        InitializeConnection();
+    }
 
+    private async void InitializeConnection()
+    {
         // Initialize the connection to the Authentication Service + Sign In
         try {
 
@@ -81,11 +78,11 @@ public class GameRelay : MonoBehaviour
 
     private void SetConnectionData(RelayServerEndpoint r, Guid a, byte[] c)
     {
-        ip = r.Host;
-        port = r.Port;
-        allocationID = a;
-        connectionData = c;
-        UIController.Instance.SetConnectionInfo("Host IP: [" + ip + "] - port:" + port+" Code: "+ JoinCode + "\nAllocation: " + allocationID+ "\n");
+        ConnectionData.ip = r.Host;
+        ConnectionData.port = r.Port;
+        ConnectionData.allocationID = a;
+        ConnectionData.connectionData = c;
+        UIController.Instance.SetConnectionInfo("Host IP: [" + ConnectionData.ip + "] - port:" + ConnectionData.port +" Code: "+ JoinCode + "\nAllocation: " + ConnectionData.allocationID + "\n");
     }
     
     private void SetConnectionDataB(string message)
@@ -108,9 +105,9 @@ public class GameRelay : MonoBehaviour
             SetConnectionDataB("Joined the Relay - signed in: ("+ AuthenticationService.Instance.IsSignedIn+") clientStarted: "+didStart);
             SetConnectionData(joinAllocation.ServerEndpoints.First(conn => conn.ConnectionType == ConnectionType.udp), joinAllocation.AllocationId, joinAllocation.ConnectionData);
             NetworkCommunicator.Instance.ResetScore();
-            NetworkCommunicator.Instance.UpdatePlayerNamesFromLobby();
-            // Set playernames from Lobby?
 
+            // Set playernames from Lobby?
+            NetworkCommunicator.Instance.UpdatePlayerNamesFromLobby();
         }
         catch (RelayServiceException e)
         {

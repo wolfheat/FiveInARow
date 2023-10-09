@@ -49,7 +49,6 @@ DEVLOG FOR - FIVE IN A ROW
 
 
 		* Make every other starting instead of random? Loser starts?
-		* Add score for the session?
 
 		* (RE)Joining a started game should get the entire game state.
 

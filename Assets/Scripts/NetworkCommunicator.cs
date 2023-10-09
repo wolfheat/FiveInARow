@@ -6,16 +6,15 @@ using UnityEngine.InputSystem;
 
 public class NetworkCommunicator : NetworkBehaviour
 {
+    [SerializeField] private GameLobby gameLobby;
 
     public static NetworkCommunicator Instance;
-    [SerializeField] private GameLobby gameLobby;
     public static int PlayerIndex { set; get; }
     public static bool IsMyTurn { get; private set; }
     public int[] CurrentScore { get; private set; } = new int[2];
     public string[] PlayerNames { get; private set; } = new string[2] { "Player A", "Player B" };
 
     private bool[] acceptedRematch = new bool[2];
-    private bool restartNotificationBeingDelivered;
     private bool waitForPlayersToJoin = true;
 
     private void Start()
@@ -54,8 +53,7 @@ public class NetworkCommunicator : NetworkBehaviour
 
     private void ResetMatchCounter()
     {
-        ResetRematchSize();
-        restartNotificationBeingDelivered = false;
+        ResetRematchSize();        
     }
 
     private bool AllPlayersWantRematch()
