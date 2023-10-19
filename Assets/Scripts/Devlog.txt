@@ -48,10 +48,11 @@ DEVLOG FOR - FIVE IN A ROW
 		* Player Names And Score are now stored
 19/10	* Made mouse work in PC application.
 		* Limited so player only can place one marker
+		* Rematch request can now be canceled
+
+		* Make every other starting instead of random? Loser starts?
 
 		* Fix disconnects so clients send their disconnet to host and host disconnects them - in application quit?
-		* Show Waiting for rematch when rematch button is pressed.
-		* Make every other starting instead of random? Loser starts?
 
 		* (RE)Joining a started game should get the entire game state.
 

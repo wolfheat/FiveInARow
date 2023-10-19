@@ -157,8 +157,18 @@ public class NetworkCommunicator : NetworkBehaviour
     public void NotifyWantRematchServerRpc(ServerRpcParams rpcParams = default)
     {
         int clientID = (int)rpcParams.Receive.SenderClientId;
-        if (acceptedRematch.Length > clientID)
+        if (clientID < acceptedRematch.Length)// Index is in array
             acceptedRematch[clientID] = true;
+
+        UIController.Instance.AddRPCInfo("Server Recieved Request request from: " + clientID);
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    public void NotifyNoLongerWantRematchServerRpc(ServerRpcParams rpcParams = default)
+    {
+        int clientID = (int)rpcParams.Receive.SenderClientId;
+        if (clientID < acceptedRematch.Length) // Index is in array
+            acceptedRematch[clientID] = false;
 
         UIController.Instance.AddRPCInfo("Server Recieved Request request from: " + clientID);
     }
