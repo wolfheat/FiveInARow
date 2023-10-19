@@ -45,11 +45,10 @@ public class TileMapController : MonoBehaviour
         PositionChange?.Invoke();
     }
         
-    public Vector2Int GetClickedIndex()
+    public Vector2Int GetClickedIndex(Vector2 pos)
     {
         // Get Mouse Position
-        Vector2 mousePosition = Inputs.Controls.Touch.TouchPosition.ReadValue<Vector2>();
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePosition);
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(pos);
 
         // Get Clicked Index
         return (Vector2Int)tilemap.WorldToCell(worldPos);

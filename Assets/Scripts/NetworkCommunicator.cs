@@ -46,6 +46,7 @@ public class NetworkCommunicator : NetworkBehaviour
                 // Use random starter
                 int randomstarter = Random.Range(0, NetworkManager.ConnectedClients.Count);
                 SendRematchConfirmationClientRpc(randomstarter);
+                ServerGameController.Instance.PlayerTurnID = randomstarter;
             }
         }
 
@@ -101,6 +102,8 @@ public class NetworkCommunicator : NetworkBehaviour
 
         SendPlacementServerRpc(randomplacement);
     }
+
+    // ONLY FOR TESTING INVALID PLACEMENTS - M key
     private void SendInvalidPlacement(InputAction.CallbackContext callbackContext)
     {
         if (StateController.Instance.State != State.Playing) return;
@@ -124,6 +127,8 @@ public class NetworkCommunicator : NetworkBehaviour
     {
         Debug.Log("Server recieved request: " + pos + " from: " + rpcParams.Receive.SenderClientId);
 
+        // Check if active player sent the message
+
         bool placementAccepted = ServerGameController.Instance.HandlePlacementInput(pos, (int)rpcParams.Receive.SenderClientId);
 
         if (!placementAccepted)
@@ -133,7 +138,8 @@ public class NetworkCommunicator : NetworkBehaviour
             {
                 Send = new ClientRpcSendParams
                 {
-                    TargetClientIds = new List<ulong> { rpcParams.Receive.SenderClientId }
+                    // Notice the player that requested this placement that ist not legal
+                    TargetClientIds = new List<ulong> { rpcParams.Receive.SenderClientId } 
                 }
             };
 
@@ -143,6 +149,8 @@ public class NetworkCommunicator : NetworkBehaviour
 
         UIController.Instance.AddRPCInfo("Position placement, accepted: " + pos + " from: " + rpcParams.Receive.SenderClientId);
         SendPlacementClientRpc(new Vector3Int(pos.x, pos.y, (int)rpcParams.Receive.SenderClientId));
+        // Server Decides which player is the active one
+        ServerGameController.Instance.NextPlayer();
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -253,7 +261,7 @@ public class NetworkCommunicator : NetworkBehaviour
         // Recieving a placement that I sent to the server
         SetMyTurn(PlayerIndex == playerTurn ? true : false);
 
-        UIController.Instance.HidePopupInfoControllerMessage();
+        //UIController.Instance.HidePopupInfoControllerMessage();
 
         // Show Info SetWaitingInfoController
         UIController.Instance.AddRPCInfo(playerTurn + " Turn. Now its my turn: " + (PlayerIndex == playerTurn));

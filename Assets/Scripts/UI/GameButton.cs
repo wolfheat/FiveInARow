@@ -22,7 +22,7 @@ public class GameButton : MonoBehaviour
     
     public void RequestJoinGame()
     {
-        Debug.Log("Trying to join Game with LobbyJoincode: " + Lobby.LobbyCode);
-        FindObjectOfType<LobbyUI>().JoinGame(Lobby.LobbyCode);
+        Debug.Log("Trying to join Game with Id: " + Lobby.Id);
+        FindObjectOfType<LobbyUI>().JoinGameId(Lobby.Id);
     }
 }

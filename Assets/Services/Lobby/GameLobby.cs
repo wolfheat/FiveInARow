@@ -178,6 +178,21 @@ public class GameLobby : MonoBehaviour
             Debug.Log(e);
         }
     }
+    
+    public async void JoinLobbyByIdAsync(string id)
+    {
+        try
+        {
+            JoinLobbyByIdOptions joinLobbyByIdOptions = new JoinLobbyByIdOptions { Player = GetPlayer()};
+            JoinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(id, joinLobbyByIdOptions);
+            UIController.Instance.JoinGameLobby(JoinedLobby);
+        }
+        catch (LobbyServiceException e)
+        {
+            UIController.Instance.ShowPopup("Invalid Code!");
+            Debug.Log(e);
+        }
+    }
 
     // CREATING
     public async void CreatePrivateLobbyAsync()

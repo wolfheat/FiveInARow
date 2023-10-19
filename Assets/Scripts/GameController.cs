@@ -75,7 +75,7 @@ public class GameController : MonoBehaviour
         return gamecomple;
     }
     
-    private void ClickedTile()
+    private void ClickedTile(Vector2 pos)
     {
         if (StateController.Instance.State != State.Playing) return;
         if (!NetworkCommunicator.IsMyTurn)
@@ -85,7 +85,7 @@ public class GameController : MonoBehaviour
         }
 
         // Client clicks handle this
-        Vector2Int posIndex = tileMapController.GetClickedIndex();
+        Vector2Int posIndex = tileMapController.GetClickedIndex(pos);
         bool validSpot = tileMapController.IsPlacementValid(posIndex);
 
         if (!validSpot)
@@ -95,7 +95,8 @@ public class GameController : MonoBehaviour
         }
         
         // Show Info SetWaitingInfoController
-        UIController.Instance.ShowPopupInfoControllerMessage("Sending "+posIndex+" placement for validation");
+        // Change this to show only show indicator?
+        //UIController.Instance.ShowPopupInfoControllerMessage("Sending "+posIndex+" placement for validation");
 
         UIController.Instance.AddRPCInfo("Sending Position for validation: " + posIndex);
         // Client accepts this placement send it to server
