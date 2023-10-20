@@ -18,14 +18,65 @@ DEVLOG FOR - FIVE IN A ROW
 		* Touch Input added
 		* Game is now draggable, had some issues with touch movement scaling 
 		* Added clamp for camera so it stays inside game area
+30/9	* Added Unity Lobby
+		* Added Lobby/Game Lobby UI
+		* Player Can change Name, leave lobby
+1/10	* Players can Create and Join Private Games by Code
+		* Changed color scheme
+		* Clicking games now joins them (needed to use ID since lobbyCode is only for members)
+		* Made lobby update players with timer
+		* Made game players info and players with timer
+		* Entering game Lobby and exiting makes double connections to main lobby? Issue fixed dod not remove Action listener i onDisable.
+		* BUILD: ZIP 29.7k
+		* Added blinker light that shows when Polling is called in Main Lobby and Game lobby
+		* Private games wont show up in the list anymore
+		* Fixed scaling issues for UI
+2/10	* Added Relay		
+		* Relay can start game but the connection is not always there
+3/10	* Relay now sends position Vector and senderInfo
+		* Added log-window for troubleshooting
+		* Server/Client Header shown
+4/10	* Game logic implemented for server play
+		* Clients requests placements that they self accept, server validates this placement and sends out action to all clients
+		* Clients report game finished, server validates this and sends out complete information to all clients
+		* Restart Game confirmation added
+		* Waiting for player Notice added
+5/10	* Fixed restart issue, players can now restart indefinitely
+		* Made Start and Join button not visible when entering lobby screen
+6/10	* Implemented turnbased gameplay. Your Turn notice show for players
+		* Random starting player for each game
+		* Player Names And Score are now stored
+19/10	* Made mouse work in PC application.
+		* Limited so player only can place one marker
+		* Rematch request can now be canceled
+20/10	
+		* Make every other starting instead of random? Loser starts?
+
+		* Fix disconnects so clients send their disconnet to host and host disconnects them - in application quit?
+
+		* (RE)Joining a started game should get the entire game state.
+
+		// SERVER ISSUSES
+		Still issue with returning to lobby not working, need to restart game to work
+		* Request Lobby button after game wont take you to lobby?
+		* Returning to Lobby How to exit relay session when leaving?
+		* Do Exiting a relay need to send data to relay to exit correctly?
+		* How do I make it possible to enter relay again after leaving?
+
+		* Determine when both players are connected (figure out why connections fail sometimes)
+		
+		* Set to android mode
+		* Have specific queries for games? Playeramount.
+		* Have three player support?
+		* Add spectators support?
 
 		TODO
-		* Inplement server code for multiplayer
-		* Have some kind of lobby? Matchmaking
+		* Make Main lobby only show games with free spots
 		* Have win line expand further than 5 in a row if there is more
-
 		* Sounds? Music?
-		* Add touch input
+
+		* Inplement server code for multiplayer - Ongoing
+		* Add touch input - OnGoing
 
 
 		

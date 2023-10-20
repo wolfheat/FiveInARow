@@ -89,6 +89,33 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""L"",
+                    ""type"": ""Button"",
+                    ""id"": ""fd98ab47-bfa7-41da-a41c-77adf5592381"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""M"",
+                    ""type"": ""Button"",
+                    ""id"": ""b9e3c4c5-ed1e-445d-a293-cc11563e0947"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""N"",
+                    ""type"": ""Button"",
+                    ""id"": ""2e45a883-ede8-4a3d-83ec-36313998c256"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -179,6 +206,39 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Shift"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9982fd30-1f3d-43b1-9582-51ce5154ec3b"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""L"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""462cdf92-d30a-41c0-8581-87e5afc52821"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""M"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d5aef8b5-18b1-4d17-a89e-9a9609ad293f"",
+                    ""path"": ""<Keyboard>/n"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""N"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -249,6 +309,34 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Mouse"",
+            ""id"": ""8d12c283-3909-435c-8af2-c9620bd1acc7"",
+            ""actions"": [
+                {
+                    ""name"": ""Click"",
+                    ""type"": ""Button"",
+                    ""id"": ""2ca35df8-db7d-48a5-a28e-4831115aac7e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""6513031b-b9c8-49a5-b5ff-c6e1a82e0873"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -262,11 +350,17 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Main_ScrollUp = m_Main.FindAction("ScrollUp", throwIfNotFound: true);
         m_Main_Scroll = m_Main.FindAction("Scroll", throwIfNotFound: true);
         m_Main_Shift = m_Main.FindAction("Shift", throwIfNotFound: true);
+        m_Main_L = m_Main.FindAction("L", throwIfNotFound: true);
+        m_Main_M = m_Main.FindAction("M", throwIfNotFound: true);
+        m_Main_N = m_Main.FindAction("N", throwIfNotFound: true);
         // Touch
         m_Touch = asset.FindActionMap("Touch", throwIfNotFound: true);
         m_Touch_TouchPress = m_Touch.FindAction("TouchPress", throwIfNotFound: true);
         m_Touch_TouchInput = m_Touch.FindAction("TouchInput", throwIfNotFound: true);
         m_Touch_TouchPosition = m_Touch.FindAction("TouchPosition", throwIfNotFound: true);
+        // Mouse
+        m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
+        m_Mouse_Click = m_Mouse.FindAction("Click", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -335,6 +429,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Main_ScrollUp;
     private readonly InputAction m_Main_Scroll;
     private readonly InputAction m_Main_Shift;
+    private readonly InputAction m_Main_L;
+    private readonly InputAction m_Main_M;
+    private readonly InputAction m_Main_N;
     public struct MainActions
     {
         private @Controls m_Wrapper;
@@ -346,6 +443,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @ScrollUp => m_Wrapper.m_Main_ScrollUp;
         public InputAction @Scroll => m_Wrapper.m_Main_Scroll;
         public InputAction @Shift => m_Wrapper.m_Main_Shift;
+        public InputAction @L => m_Wrapper.m_Main_L;
+        public InputAction @M => m_Wrapper.m_Main_M;
+        public InputAction @N => m_Wrapper.m_Main_N;
         public InputActionMap Get() { return m_Wrapper.m_Main; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -376,6 +476,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Shift.started += instance.OnShift;
             @Shift.performed += instance.OnShift;
             @Shift.canceled += instance.OnShift;
+            @L.started += instance.OnL;
+            @L.performed += instance.OnL;
+            @L.canceled += instance.OnL;
+            @M.started += instance.OnM;
+            @M.performed += instance.OnM;
+            @M.canceled += instance.OnM;
+            @N.started += instance.OnN;
+            @N.performed += instance.OnN;
+            @N.canceled += instance.OnN;
         }
 
         private void UnregisterCallbacks(IMainActions instance)
@@ -401,6 +510,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Shift.started -= instance.OnShift;
             @Shift.performed -= instance.OnShift;
             @Shift.canceled -= instance.OnShift;
+            @L.started -= instance.OnL;
+            @L.performed -= instance.OnL;
+            @L.canceled -= instance.OnL;
+            @M.started -= instance.OnM;
+            @M.performed -= instance.OnM;
+            @M.canceled -= instance.OnM;
+            @N.started -= instance.OnN;
+            @N.performed -= instance.OnN;
+            @N.canceled -= instance.OnN;
         }
 
         public void RemoveCallbacks(IMainActions instance)
@@ -480,6 +598,52 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         }
     }
     public TouchActions @Touch => new TouchActions(this);
+
+    // Mouse
+    private readonly InputActionMap m_Mouse;
+    private List<IMouseActions> m_MouseActionsCallbackInterfaces = new List<IMouseActions>();
+    private readonly InputAction m_Mouse_Click;
+    public struct MouseActions
+    {
+        private @Controls m_Wrapper;
+        public MouseActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Click => m_Wrapper.m_Mouse_Click;
+        public InputActionMap Get() { return m_Wrapper.m_Mouse; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MouseActions set) { return set.Get(); }
+        public void AddCallbacks(IMouseActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MouseActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MouseActionsCallbackInterfaces.Add(instance);
+            @Click.started += instance.OnClick;
+            @Click.performed += instance.OnClick;
+            @Click.canceled += instance.OnClick;
+        }
+
+        private void UnregisterCallbacks(IMouseActions instance)
+        {
+            @Click.started -= instance.OnClick;
+            @Click.performed -= instance.OnClick;
+            @Click.canceled -= instance.OnClick;
+        }
+
+        public void RemoveCallbacks(IMouseActions instance)
+        {
+            if (m_Wrapper.m_MouseActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IMouseActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MouseActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MouseActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public MouseActions @Mouse => new MouseActions(this);
     public interface IMainActions
     {
         void OnClick(InputAction.CallbackContext context);
@@ -489,11 +653,18 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnScrollUp(InputAction.CallbackContext context);
         void OnScroll(InputAction.CallbackContext context);
         void OnShift(InputAction.CallbackContext context);
+        void OnL(InputAction.CallbackContext context);
+        void OnM(InputAction.CallbackContext context);
+        void OnN(InputAction.CallbackContext context);
     }
     public interface ITouchActions
     {
         void OnTouchPress(InputAction.CallbackContext context);
         void OnTouchInput(InputAction.CallbackContext context);
         void OnTouchPosition(InputAction.CallbackContext context);
+    }
+    public interface IMouseActions
+    {
+        void OnClick(InputAction.CallbackContext context);
     }
 }
