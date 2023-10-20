@@ -2264,7 +2264,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2875545958071012245, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
       propertyPath: m_text
-      value: Cancel
+      value: Rematch
       objectReference: {fileID: 0}
     - target: {fileID: 3934713667079539712, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -2284,11 +2284,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7922204019748250123, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
       propertyPath: m_Color.g
-      value: 0.8924004
+      value: 0.9607843
       objectReference: {fileID: 0}
     - target: {fileID: 7922204019748250123, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
       propertyPath: m_Color.r
-      value: 0.9607843
+      value: 0.7294118
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2519,6 +2519,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameLobby: {fileID: 1762042250}
+  infoController: {fileID: 162236185}
 --- !u!114 &332946615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7322,7 +7323,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2875545958071012245, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
       propertyPath: m_text
-      value: Rematch
+      value: Cancel
       objectReference: {fileID: 0}
     - target: {fileID: 3934713667079539712, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -7343,6 +7344,14 @@ PrefabInstance:
     - target: {fileID: 4066203925061171809, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922204019748250123, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
+      propertyPath: m_Color.g
+      value: 0.89411765
+      objectReference: {fileID: 0}
+    - target: {fileID: 7922204019748250123, guid: da4d1dfadb014c74a93d9b6ef27c2af3, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9607843
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

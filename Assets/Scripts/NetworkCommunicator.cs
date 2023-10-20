@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 public class NetworkCommunicator : NetworkBehaviour
 {
     [SerializeField] private GameLobby gameLobby;
+    [SerializeField] private InfoController infoController;
 
     public static NetworkCommunicator Instance;
     public static int PlayerIndex { set; get; }
@@ -205,6 +206,7 @@ public class NetworkCommunicator : NetworkBehaviour
         Debug.Log("Client recieved winner: " + winner);
         UIController.Instance.AddRPCInfo("Client Recieved Winner: " + winner);
         GameController.Instance.ShowWinner(winner);
+        infoController.InitRequestRematchMenu();
         if (!IsServer) UpdateClientScore(currentScore);
     }
 

@@ -42,6 +42,13 @@ public class InfoController : MonoBehaviour
         NetworkCommunicator.Instance.NotifyWantRematchServerRpc();
     }
     
+    public void InitRequestRematchMenu()
+    {
+        rematchButton.gameObject.SetActive(true);
+        cancelRematchButton.gameObject.SetActive(false);
+        rematchText.text = "Rematch";
+    }
+    
     public void CancelRequestRematch()
     {
         Debug.Log("Request Rematch Canceled");

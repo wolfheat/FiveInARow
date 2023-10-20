@@ -49,7 +49,7 @@ DEVLOG FOR - FIVE IN A ROW
 19/10	* Made mouse work in PC application.
 		* Limited so player only can place one marker
 		* Rematch request can now be canceled
-
+20/10	
 		* Make every other starting instead of random? Loser starts?
 
 		* Fix disconnects so clients send their disconnet to host and host disconnects them - in application quit?
