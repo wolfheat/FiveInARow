@@ -161,7 +161,7 @@ public class NetworkCommunicator : NetworkBehaviour
         if (clientID < acceptedRematch.Length)// Index is in array
             acceptedRematch[clientID] = true;
 
-        UIController.Instance.AddRPCInfo("Server Recieved Request request from: " + clientID);
+        UIController.Instance.AddRPCInfo("Server Recieved Rematch request from: " + clientID);
     }
     
     [ServerRpc(RequireOwnership = false)]

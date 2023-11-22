@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using TMPro;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameLobbyUI : MonoBehaviour
@@ -29,9 +27,7 @@ public class GameLobbyUI : MonoBehaviour
     {
         if (Instance != null) Destroy(gameObject);
         Instance = this;
-    }
-
-    
+    }       
 
     private void Init()
     {
@@ -50,18 +46,6 @@ public class GameLobbyUI : MonoBehaviour
         GameLobby.Polling -= UpdateLobby;
     }
 
-    private void PollingUpdate(Lobby obj)
-    {
-
-        Debug.Log("Polling recieved, update players and text");
-        UpdatePlayers();
-    }
-
-    private void TickLobby()
-    {
-        throw new NotImplementedException();
-    }
-
     private void CreatePlayerButtons()
     {
         playerButtons = new PlayerButton[AmountOfPlayers];
@@ -72,11 +56,6 @@ public class GameLobbyUI : MonoBehaviour
             playerButton.gameObject.SetActive(false);
         }
         
-    }
-
-    private bool IsLobbyHost()
-    {
-        return true;
     }
 
     public void UpdatePlayers()

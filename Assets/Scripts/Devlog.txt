@@ -50,9 +50,16 @@ DEVLOG FOR - FIVE IN A ROW
 		* Limited so player only can place one marker
 		* Rematch request can now be canceled
 20/10	
+21/11	* Made leaving game go to Main lobby.
+
+		* Fix issue when players leave game and start new, state wont leave waiting for players. Fix
+
+
 		* Make every other starting instead of random? Loser starts?
+		* Have exit button when waiting for players to start a game.
 
 		* Fix disconnects so clients send their disconnet to host and host disconnects them - in application quit?
+		* When player leave game and go to lobby, other players should get notified of this.
 
 		* (RE)Joining a started game should get the entire game state.
 

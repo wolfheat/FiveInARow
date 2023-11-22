@@ -137,8 +137,8 @@ public class UIController : MonoBehaviour
         // Disconnect from server and show lobby
 
         //GameRelay.Instance.Disconnect();
-
-        ShowJoinedLobby();
+        gameLobby.LeaveLobbyAsync();
+        //ShowJoinedLobby();
     }
     public void ShowPopup(string message)
     {
